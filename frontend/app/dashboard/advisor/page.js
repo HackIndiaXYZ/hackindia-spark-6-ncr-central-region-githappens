@@ -70,7 +70,7 @@ export default function AdvisorPage() {
       setMessages(prev => [...prev, { 
         id: Date.now() + 1, 
         role: 'assistant', 
-        content: "Navi encountered an error processing the strategic analysis. Please ensure the backend is connected." 
+        content: `Navi Strategic Error: ${err.message}. Please check backend availability.` 
       }]);
     } finally {
       setIsTyping(false);
