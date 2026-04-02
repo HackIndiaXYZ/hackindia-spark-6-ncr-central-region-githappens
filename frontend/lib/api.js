@@ -29,18 +29,26 @@ const api = {
 
   // ── Navi Multi-Agent Intelligence ──────────────────────────
   queryNavi: async (query) => {
-    const res = await fetch(`${getApiUrl()}/navi/query`, {
+    const fetchUrl = `${getApiUrl()}/navi/query`;
+    const res = await fetch(fetchUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
     });
-    if (!res.ok) throw new Error('Navi pipeline failed');
+    if (!res.ok) {
+      const errText = await res.text().catch(() => 'No internal error body');
+      throw new Error(`Navi failed (${res.status}) at ${fetchUrl}: ${errText}`);
+    }
     return res.json();
   },
 
   loadNaviDemo: async () => {
-    const res = await fetch(`${getApiUrl()}/navi/demo`);
-    if (!res.ok) throw new Error('Demo scenario failed');
+    const fetchUrl = `${getApiUrl()}/navi/demo`;
+    const res = await fetch(fetchUrl);
+    if (!res.ok) {
+      const errText = await res.text().catch(() => 'No internal error body');
+      throw new Error(`Demo failed (${res.status}) at ${fetchUrl}: ${errText}`);
+    }
     return res.json();
   },
 
