@@ -7,10 +7,16 @@ export default async function DashboardPage() {
   console.log(`[Dashboard] Dynamic Base URL: ${baseUrl}`);
 
   try {
+    const summaryUrl = `${baseUrl}/api/dashboard/summary`;
+    const recommendationsUrl = `${baseUrl}/api/recommendations`;
+    
     const [summaryRes, recommendationsRes] = await Promise.all([
-      fetch(`${baseUrl}/api/dashboard/summary`, { next: { revalidate: 60 } }),
-      fetch(`${baseUrl}/api/recommendations`, { next: { revalidate: 60 } })
+      fetch(summaryUrl, { next: { revalidate: 60 } }),
+      fetch(recommendationsUrl, { next: { revalidate: 60 } })
     ]);
+
+    if (!summaryRes.ok) throw new Error(`Summary API failed (${summaryRes.status}) at ${summaryUrl}`);
+    if (!recommendationsRes.ok) throw new Error(`Recommendations API failed (${recommendationsRes.status}) at ${recommendationsUrl}`);
 
     const summary = await summaryRes.json();
     const recommendations = await recommendationsRes.json();
@@ -22,7 +28,16 @@ export default async function DashboardPage() {
     );
   } catch (error) {
     console.error('Failed to fetch dashboard data:', error);
-    return <div>Error loading dashboard. Please ensure backend is running.</div>;
+    return (
+      <div className="p-10 bg-amber-500/10 border border-amber-500/20 rounded-3xl">
+        <h2 className="text-xl font-bold text-amber-500 mb-2">Command Center Offline</h2>
+        <p className="text-sm font-medium text-amber-500/60 mb-4">Tactical summary feed could not be established.</p>
+        <div className="bg-black/20 p-4 rounded-xl font-mono text-[10px] text-amber-500/40 break-all">
+          Internal Router: {baseUrl}<br/>
+          Resolution Error: {error.message}
+        </div>
+      </div>
+    );
   }
 }
 

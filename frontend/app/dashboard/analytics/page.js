@@ -7,7 +7,9 @@ export default async function AnalyticsPage() {
   console.log(`[Analytics] Dynamic Base URL: ${baseUrl}`);
 
   try {
-    const res = await fetch(`${baseUrl}/api/analytics`, { next: { revalidate: 60 } });
+    const fetchUrl = `${baseUrl}/api/analytics`;
+    const res = await fetch(fetchUrl, { next: { revalidate: 60 } });
+    if (!res.ok) throw new Error(`Backend returned ${res.status} for ${fetchUrl}`);
     const analyticsData = await res.json();
 
     return (
@@ -17,7 +19,16 @@ export default async function AnalyticsPage() {
     );
   } catch (error) {
     console.error('Failed to fetch analytics data:', error);
-    return <div>Error loading analytics. Please ensure backend is running at {baseUrl}.</div>;
+    return (
+      <div className="p-10 bg-rose-500/10 border border-rose-500/20 rounded-3xl">
+        <h2 className="text-xl font-bold text-rose-500 mb-2">Analytics Link failure</h2>
+        <p className="text-sm font-medium text-rose-500/60 mb-4">High-level intelligence feed is offline.</p>
+        <div className="bg-black/20 p-4 rounded-xl font-mono text-[10px] text-rose-500/40 break-all">
+          Attempted Fetch: {baseUrl}/api/analytics<br/>
+          Resolution Error: {error.message}
+        </div>
+      </div>
+    );
   }
 }
 

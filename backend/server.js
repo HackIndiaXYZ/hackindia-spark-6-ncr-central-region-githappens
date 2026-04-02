@@ -17,7 +17,11 @@ app.use(express.json());
 app.use((req, res, next) => {
   const originalUrl = req.url;
   if (req.url.startsWith('/_/backend')) {
-    req.url = req.url.replace('/_/backend', '');
+    req.url = req.url.replace('/_/backend', '') || '/';
+  }
+  // Ensure the URL starts with a slash after replacement
+  if (req.url && !req.url.startsWith('/')) {
+    req.url = '/' + req.url;
   }
   console.log(`[${new Date().toISOString().split('T')[1].split('.')[0]}] ${req.method} ${originalUrl} -> ${req.url}`);
   next();
