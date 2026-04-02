@@ -144,14 +144,23 @@ Provide a grounded, actionable decision. Use your execution tools if the task re
       if (responseMessage.tool_calls) {
         // Run specific Execution Tools!
         for (const toolCall of responseMessage.tool_calls) {
-          const args = JSON.parse(toolCall.function.arguments || "{}");
-          const executionOutput = await executeTool(toolCall.function.name, args);
-          
-          messages.push({
-            role: "tool",
-            tool_call_id: toolCall.id,
-            content: executionOutput
-          });
+          try {
+            const args = JSON.parse(toolCall.function.arguments || "{}");
+            const executionOutput = await executeTool(toolCall.function.name, args);
+            
+            messages.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: executionOutput
+            });
+          } catch (toolErr) {
+            console.error("Tool Execution/Parse Error:", toolErr);
+            messages.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: `Execution error: ${toolErr.message}`
+            });
+          }
         }
         // Loop back to let LLM analyze the internal tool results
         continue;

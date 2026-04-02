@@ -23,7 +23,8 @@ app.use((req, res, next) => {
   if (req.url && !req.url.startsWith('/')) {
     req.url = '/' + req.url;
   }
-  console.log(`[${new Date().toISOString().split('T')[1].split('.')[0]}] ${req.method} ${originalUrl} -> ${req.url}`);
+  const bodySize = req.body ? JSON.stringify(req.body).length : 0;
+  console.log(`[${new Date().toISOString().split('T')[1].split('.')[0]}] ${req.method} ${originalUrl} -> ${req.url} (Body: ${bodySize} bytes)`);
   next();
 });
 
