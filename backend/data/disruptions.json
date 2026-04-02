@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "ALT-101",
+    "type": "weather",
+    "severity": "critical",
+    "title": "Typhoon Malakas Impact",
+    "message": "Shanghai Port operations suspended due to high swell and wind speeds. 12 shipments rerouted via Ningbo.",
+    "timestamp": "2026-04-02T16:20:00Z",
+    "read": false
+  },
+  {
+    "id": "ALT-102",
+    "type": "congestion",
+    "severity": "high",
+    "title": "Suez Canal Bottleneck",
+    "message": "Increased transit wait times detected (average 24h delay). Strategic rerouting via Cape of Good Hope recommended for high-priority cargo.",
+    "timestamp": "2026-04-02T14:45:00Z",
+    "read": false
+  },
+  {
+    "id": "ALT-103",
+    "type": "ai_recommendation",
+    "severity": "medium",
+    "title": "Stockout Risk: Microchips",
+    "message": "Predictive model suggests 22% risk of raw material shortage in Q3. Recommendation: Diversify suppliers in the ASEAN region.",
+    "timestamp": "2026-04-02T12:30:00Z",
+    "read": true
+  }
+]

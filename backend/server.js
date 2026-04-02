@@ -135,9 +135,7 @@ app.get('/api/routes', (req, res) => res.json(routes));
 
 // ─── Alerts System ────────────────────────────────────────────
 app.get('/api/alerts', (req, res) => {
-  // Empty array as we strictly use real-time signals now
-  const alerts = [];
-  res.json(alerts);
+  res.json(disruptions);
 });
 
 
