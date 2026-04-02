@@ -4,8 +4,14 @@
     "type": "weather",
     "severity": "critical",
     "title": "Typhoon Malakas Impact",
-    "message": "Shanghai Port operations suspended due to high swell and wind speeds. 12 shipments rerouted via Ningbo.",
+    "description": "Shanghai Port operations suspended due to high swell and wind speeds. 12 shipments rerouted via Ningbo.",
+    "region": "East Asia",
+    "affectedPorts": ["Shanghai", "Ningbo"],
+    "estimatedDelay": "4-6 days",
+    "shipmentsAffected": 12,
+    "costImpact": 3400000,
     "timestamp": "2026-04-02T16:20:00Z",
+    "status": "active",
     "read": false
   },
   {
@@ -13,8 +19,14 @@
     "type": "congestion",
     "severity": "high",
     "title": "Suez Canal Bottleneck",
-    "message": "Increased transit wait times detected (average 24h delay). Strategic rerouting via Cape of Good Hope recommended for high-priority cargo.",
+    "description": "Increased transit wait times detected (average 24h delay). Strategic rerouting via Cape of Good Hope recommended for high-priority cargo.",
+    "region": "Middle East",
+    "affectedPorts": ["Port Said", "Aden", "Jeddah"],
+    "estimatedDelay": "24h - 48h",
+    "shipmentsAffected": 28,
+    "costImpact": 1800000,
     "timestamp": "2026-04-02T14:45:00Z",
+    "status": "active",
     "read": false
   },
   {
@@ -22,8 +34,14 @@
     "type": "ai_recommendation",
     "severity": "medium",
     "title": "Stockout Risk: Microchips",
-    "message": "Predictive model suggests 22% risk of raw material shortage in Q3. Recommendation: Diversify suppliers in the ASEAN region.",
+    "description": "Predictive model suggests 22% risk of raw material shortage in Q3. Recommendation: Diversify suppliers in the ASEAN region.",
+    "region": "ASEAN",
+    "affectedPorts": ["Singapore", "Ho Chi Minh"],
+    "estimatedDelay": "Potential Q3 delays",
+    "shipmentsAffected": 0,
+    "costImpact": 1200000,
     "timestamp": "2026-04-02T12:30:00Z",
+    "status": "active",
     "read": true
   }
 ]

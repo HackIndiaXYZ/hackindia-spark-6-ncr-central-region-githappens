@@ -33,11 +33,14 @@ function scoreRelevance(doc, queryTokens) {
 function buildCorpus(disruptions, routes, shipments, suppliers) {
   const docs = [];
 
-  disruptions.forEach(d => docs.push({
-    type: 'disruption', id: d.id,
-    content: `Disruption ${d.id}: ${d.title}. ${d.description} Region: ${d.region}. Severity: ${d.severity}. Affected ports: ${d.affectedPorts.join(', ')}. Estimated delay: ${d.estimatedDelay}. Ships affected: ${d.shipmentsAffected}. Cost impact: ₹${(d.costImpact / 100000).toFixed(1)}L. Status: ${d.status}.`,
-    raw: d
-  }));
+  disruptions.forEach(d => {
+    const ports = (d.affectedPorts || []).join(', ') || 'N/A';
+    docs.push({
+      type: 'disruption', id: d.id,
+      content: `Disruption ${d.id}: ${d.title}. ${d.description || d.message || ''} Region: ${d.region || 'Global'}. Severity: ${d.severity}. Affected ports: ${ports}. Estimated delay: ${d.estimatedDelay || 'Unknown'}. Ships affected: ${d.shipmentsAffected || 0}. Cost impact: ₹${((d.costImpact || 0) / 100000).toFixed(1)}L. Status: ${d.status || 'Active'}.`,
+      raw: d
+    });
+  });
 
   routes.forEach(r => docs.push({
     type: 'route', id: r.id,
