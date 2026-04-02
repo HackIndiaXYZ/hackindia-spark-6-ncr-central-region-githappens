@@ -5,6 +5,7 @@ import {
   Search, ShieldAlert, BarChart3, ChevronRight, 
   AlertTriangle, Check, IndianRupee, Clock, Layers, Bot
 } from 'lucide-react';
+import api from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SimulationPage() {
@@ -25,19 +26,14 @@ export default function SimulationPage() {
     
     try {
       // Map frontend params to backend expected fields
-      const res = await fetch('/api/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          supplierLocation: params.origin,
-          destination: params.destination,
-          transportType: params.transport,
-          budgetMode: params.budget,
-          riskTolerance: params.risk,
-          timeSensitivity: params.time
-        })
+      const data = await api.runSimulation({
+        supplierLocation: params.origin,
+        destination: params.destination,
+        transportType: params.transport,
+        budgetMode: params.budget,
+        riskTolerance: params.risk,
+        timeSensitivity: params.time
       });
-      const data = await res.json();
       
       const formatCurrency = (val) => {
         if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)}Cr`;

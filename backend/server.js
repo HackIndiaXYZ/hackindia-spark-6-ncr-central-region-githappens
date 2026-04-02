@@ -15,9 +15,11 @@ app.use(express.json());
 
 // Handle Vercel experimentalServices routing prefixes
 app.use((req, res, next) => {
+  const originalUrl = req.url;
   if (req.url.startsWith('/_/backend')) {
     req.url = req.url.replace('/_/backend', '');
   }
+  console.log(`[${new Date().toISOString().split('T')[1].split('.')[0]}] ${req.method} ${originalUrl} -> ${req.url}`);
   next();
 });
 
@@ -113,14 +115,16 @@ app.post('/api/shipments', (req, res) => {
 
   shipments.unshift(newShipment);
   
-  // Persist to file
+  // Persist to file (Optional in production/Vercel)
   try {
     writeFileSync(join(__dirname, 'data', 'shipments.json'), JSON.stringify(shipments, null, 2));
-    res.status(201).json(newShipment);
+    console.log(`✅ Shipment ${newShipment.id} persisted to disk.`);
   } catch (err) {
-    console.error('Save error:', err);
-    res.status(500).json({ error: 'Failed to persist shipment' });
+    console.warn(`⚠️ Disk persistence failed (likely Vercel/Read-only): ${err.message}`);
+    console.log(`ℹ️ Shipment ${newShipment.id} remains in-memory for the current session.`);
   }
+  
+  res.status(201).json(newShipment);
 });
 
 // ─── Suppliers ────────────────────────────────────────────────
