@@ -3,7 +3,7 @@ import AlertsList from './AlertsList';
 
 // Next.js 15 Server Component
 export default async function AlertsPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/_/backend' : 'http://localhost:5000');
 
   try {
     const res = await fetch(`${baseUrl}/api/alerts`, { next: { revalidate: 30 } });

@@ -3,7 +3,7 @@ import ShipmentsList from './ShipmentsList';
 
 // Next.js 15 Server Component
 export default async function ShipmentsPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/_/backend' : 'http://localhost:5000');
 
   try {
     const res = await fetch(`${baseUrl}/api/shipments`, { next: { revalidate: 30 } });

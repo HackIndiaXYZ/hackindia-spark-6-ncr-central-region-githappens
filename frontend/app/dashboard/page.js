@@ -5,7 +5,7 @@ import CommandCenterUI from './CommandCenterUI';
 export default async function DashboardPage() {
   // Fetch data on the server for faster initial pageload
   // Use absolute URL or relative if configured (using localhost for local dev)
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/_/backend' : 'http://localhost:5000');
 
   try {
     const [summaryRes, recommendationsRes] = await Promise.all([
