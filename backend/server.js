@@ -13,6 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Handle Vercel experimentalServices routing prefixes
+app.use((req, res, next) => {
+  if (req.url.startsWith('/_/backend')) {
+    req.url = req.url.replace('/_/backend', '');
+  }
+  next();
+});
+
 // Load mock data
 const loadData = (file) => JSON.parse(readFileSync(join(__dirname, 'data', file), 'utf-8'));
 const disruptions = loadData('disruptions.json');
