@@ -4,10 +4,9 @@ import AnalyticsUI from './AnalyticsUI';
 
 // Next.js 15 Server Component
 export default async function AnalyticsPage() {
-  const baseUrl = await getBaseUrl();
-  console.log(`[Analytics] Dynamic Base URL: ${baseUrl}`);
-
+  let baseUrl = 'unresolved';
   try {
+    baseUrl = await getBaseUrl();
     const fetchUrl = `${baseUrl}/api/analytics`;
     const res = await fetch(fetchUrl, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`Backend returned ${res.status} for ${fetchUrl}`);
@@ -19,7 +18,7 @@ export default async function AnalyticsPage() {
       </Suspense>
     );
   } catch (error) {
-    console.error('Failed to fetch analytics data:', error);
+    console.error('Failed to resolve or fetch analytics:', error);
     return (
       <div className="p-10 bg-rose-500/10 border border-rose-500/20 rounded-3xl">
         <h2 className="text-xl font-bold text-rose-500 mb-2">Analytics Link failure</h2>
