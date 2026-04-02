@@ -24,10 +24,10 @@ export default function AdvisorPage() {
   const chatEndRef = useRef(null);
 
   const chips = [
+    "Check System Status",
     "Storm detected via API — best route and immediate action?",
     "Predict delays this week",
     "Reduce cost exposure",
-    "Geopolitical risk assessment"
   ];
 
   const handleSendMessage = async (e, textOverride = '') => {
