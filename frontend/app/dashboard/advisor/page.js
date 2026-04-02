@@ -70,7 +70,8 @@ export default function AdvisorPage() {
       setMessages(prev => [...prev, { 
         id: Date.now() + 1, 
         role: 'assistant', 
-        content: `Navi Strategic Error: ${err.message}. Please check backend availability.` 
+        isError: true,
+        content: `LOGISTICS PIPELINE CRITICAL FAILURE: ${err.message}. If this is a 404, the Vercel-to-Express bridge is broken.` 
       }]);
     } finally {
       setIsTyping(false);
@@ -125,8 +126,8 @@ export default function AdvisorPage() {
             </div>
             
             <div className={`flex flex-col gap-4 max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-              <div className={`w-full p-5 rounded-3xl text-sm leading-relaxed shadow-xl ${msg.role === 'user' ? 'bg-[var(--secondary)] text-white rounded-tr-none' : 'glass-card border border-[var(--primary)]/10 text-[var(--text-secondary)] rounded-tl-none'}`}>
-                 <div className={msg.role === 'user' ? '' : 'text-[13px] text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap'}>
+              <div className={`w-full p-5 rounded-3xl text-sm leading-relaxed shadow-xl ${msg.role === 'user' ? 'bg-[var(--secondary)] text-white rounded-tr-none' : msg.isError ? 'bg-rose-500/20 border border-rose-500/50 text-rose-200 rounded-tl-none' : 'glass-card border border-[var(--primary)]/10 text-[var(--text-secondary)] rounded-tl-none'}`}>
+                 <div className={msg.role === 'user' ? '' : msg.isError ? 'font-bold' : 'text-[13px] text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap'}>
                    {msg.conversationalReply || msg.content}
                  </div>
 
@@ -277,7 +278,7 @@ export default function AdvisorPage() {
              </div>
           </form>
           <div className="mt-4 text-center">
-             <span className="text-[9px] text-[var(--text-muted)]/20 font-bold uppercase tracking-[0.3em]">Navi Intelligence v1.0 • Multi-Agent RAG Active</span>
+             <span className="text-[9px] text-[var(--text-muted)]/20 font-bold uppercase tracking-[0.3em]">Navi Intelligence v1.2 (Debug-01) • Multi-Agent RAG Active</span>
           </div>
       </div>
     </div>
