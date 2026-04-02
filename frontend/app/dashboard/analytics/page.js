@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { getBaseUrl } from '@/lib/api-server';
 import AnalyticsUI from './AnalyticsUI';
 
