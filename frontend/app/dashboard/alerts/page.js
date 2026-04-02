@@ -1,14 +1,18 @@
 import React, { Suspense } from 'react';
+import { headers } from 'next/headers';
 import AlertsList from './AlertsList';
 
 // Next.js 15 Server Component
 export default async function AlertsPage() {
-  const getBaseUrl = () => {
+  const getBaseUrl = async () => {
     if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    const headerList = await headers();
+    const host = headerList.get('host');
+    if (host && !host.includes('localhost')) return `https://${host}/_/backend`;
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/_/backend`;
     return 'http://localhost:5000';
   };
-  const baseUrl = getBaseUrl();
+  const baseUrl = await getBaseUrl();
 
   try {
     const res = await fetch(`${baseUrl}/api/alerts`, { next: { revalidate: 30 } });
