@@ -30,11 +30,14 @@ export default function ShipmentsList({ initialShipments }) {
   const [shipments] = useState(initialShipments);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredShipments = shipments.filter(s => 
-    s.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.destination.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredShipments = (shipments || []).filter(s => {
+    if (!s) return false;
+    const term = searchTerm.toLowerCase();
+    const id = String(s.id || '').toLowerCase();
+    const origin = String(s.origin || '').toLowerCase();
+    const dest = String(s.destination || '').toLowerCase();
+    return id.includes(term) || origin.includes(term) || dest.includes(term);
+  });
 
   const formatCurrency = (val) => {
     if (!val || isNaN(val)) return '₹0.00';
