@@ -5,7 +5,12 @@ import CommandCenterUI from './CommandCenterUI';
 export default async function DashboardPage() {
   // Fetch data on the server for faster initial pageload
   // Use absolute URL or relative if configured (using localhost for local dev)
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/_/backend' : 'http://localhost:5000');
+  const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/_/backend`;
+    return 'http://localhost:5000';
+  };
+  const baseUrl = getBaseUrl();
 
   try {
     const [summaryRes, recommendationsRes] = await Promise.all([

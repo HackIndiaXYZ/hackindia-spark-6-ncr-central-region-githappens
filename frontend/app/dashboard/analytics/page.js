@@ -3,7 +3,12 @@ import AnalyticsUI from './AnalyticsUI';
 
 // Next.js 15 Server Component
 export default async function AnalyticsPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/_/backend' : 'http://localhost:5000');
+  const getBaseUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/_/backend`;
+    return 'http://localhost:5000';
+  };
+  const baseUrl = getBaseUrl();
 
   try {
     const res = await fetch(`${baseUrl}/api/analytics`, { next: { revalidate: 60 } });
