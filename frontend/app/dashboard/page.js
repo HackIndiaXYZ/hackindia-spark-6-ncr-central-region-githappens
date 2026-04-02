@@ -1,19 +1,8 @@
-import React, { Suspense } from 'react';
-import { headers } from 'next/headers';
+import { getBaseUrl } from '@/lib/api-server';
 import CommandCenterUI from './CommandCenterUI';
 
 // This is a Server Component in Next.js 15
 export default async function DashboardPage() {
-  // Fetch data on the server for faster initial pageload
-  // Use absolute URL or relative if configured (using localhost for local dev)
-  const getBaseUrl = async () => {
-    if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-    const headerList = await headers();
-    const host = headerList.get('host');
-    if (host && !host.includes('localhost')) return `https://${host}/_/backend`;
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/_/backend`;
-    return 'http://localhost:5000';
-  };
   const baseUrl = await getBaseUrl();
   console.log(`[Dashboard] Dynamic Base URL: ${baseUrl}`);
 

@@ -1,26 +1,24 @@
-const getBaseUrl = () => {
+const getApiUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
   if (typeof window !== 'undefined') {
     const host = window.location.host;
-    if (!host.includes('localhost')) {
+    if (host && !host.includes('localhost')) {
       return '/_/backend/api';
     }
   }
   return '/api';
 };
 
-const BASE_URL = getBaseUrl();
-
 const api = {
   getDashboardSummary: async () => {
-    const res = await fetch(`${BASE_URL}/dashboard/summary`);
+    const res = await fetch(`${getApiUrl()}/dashboard/summary`);
     if (!res.ok) throw new Error('Failed to fetch summary');
     return res.json();
   },
 
   // Legacy — kept for backward compat
   getAIAdvisorInsights: async (prompt) => {
-    const res = await fetch(`${BASE_URL}/ai/advisor`, {
+    const res = await fetch(`${getApiUrl()}/ai/advisor`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
@@ -31,7 +29,7 @@ const api = {
 
   // ── Navi Multi-Agent Intelligence ──────────────────────────
   queryNavi: async (query) => {
-    const res = await fetch(`${BASE_URL}/navi/query`, {
+    const res = await fetch(`${getApiUrl()}/navi/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
@@ -41,19 +39,19 @@ const api = {
   },
 
   loadNaviDemo: async () => {
-    const res = await fetch(`${BASE_URL}/navi/demo`);
+    const res = await fetch(`${getApiUrl()}/navi/demo`);
     if (!res.ok) throw new Error('Demo scenario failed');
     return res.json();
   },
 
   getShipments: async () => {
-    const res = await fetch(`${BASE_URL}/shipments`);
+    const res = await fetch(`${getApiUrl()}/shipments`);
     if (!res.ok) throw new Error('Failed to fetch shipments');
     return res.json();
   },
 
   bookShipment: async (data) => {
-    const res = await fetch(`${BASE_URL}/shipments`, {
+    const res = await fetch(`${getApiUrl()}/shipments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -63,7 +61,7 @@ const api = {
   },
 
   runSimulation: async (params) => {
-    const res = await fetch(`${BASE_URL}/simulate`, {
+    const res = await fetch(`${getApiUrl()}/simulate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
