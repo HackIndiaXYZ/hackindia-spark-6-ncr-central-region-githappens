@@ -1,4 +1,15 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') {
+    const host = window.location.host;
+    if (!host.includes('localhost')) {
+      return '/_/backend/api';
+    }
+  }
+  return '/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 const api = {
   getDashboardSummary: async () => {
