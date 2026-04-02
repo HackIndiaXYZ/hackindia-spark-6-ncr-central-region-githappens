@@ -1,0 +1,68 @@
+[
+  {
+    "id": "SUP-001",
+    "name": "TechParts Co.",
+    "location": "Shanghai, China",
+    "coordinates": { "lat": 31.2, "lng": 121.5 },
+    "category": "Electronics",
+    "reliability": 87,
+    "riskScore": 35,
+    "activeShipments": 12,
+    "totalValue": 8500000
+  },
+  {
+    "id": "SUP-002",
+    "name": "GadgetWorld Ltd.",
+    "location": "Shenzhen, China",
+    "coordinates": { "lat": 22.5, "lng": 114.1 },
+    "category": "Consumer Electronics",
+    "reliability": 82,
+    "riskScore": 48,
+    "activeShipments": 8,
+    "totalValue": 12400000
+  },
+  {
+    "id": "SUP-003",
+    "name": "PharmaChem India",
+    "location": "Mumbai, India",
+    "coordinates": { "lat": 19.1, "lng": 72.9 },
+    "category": "Pharmaceuticals",
+    "reliability": 91,
+    "riskScore": 22,
+    "activeShipments": 5,
+    "totalValue": 4200000
+  },
+  {
+    "id": "SUP-004",
+    "name": "NipponAuto Parts",
+    "location": "Tokyo, Japan",
+    "coordinates": { "lat": 35.7, "lng": 139.7 },
+    "category": "Automotive",
+    "reliability": 96,
+    "riskScore": 12,
+    "activeShipments": 15,
+    "totalValue": 18900000
+  },
+  {
+    "id": "SUP-005",
+    "name": "SilkRoad Textiles",
+    "location": "Shanghai, China",
+    "coordinates": { "lat": 31.2, "lng": 121.5 },
+    "category": "Textiles",
+    "reliability": 78,
+    "riskScore": 42,
+    "activeShipments": 6,
+    "totalValue": 3100000
+  },
+  {
+    "id": "SUP-006",
+    "name": "VietFashion Corp",
+    "location": "Ho Chi Minh City, Vietnam",
+    "coordinates": { "lat": 10.8, "lng": 106.6 },
+    "category": "Apparel",
+    "reliability": 84,
+    "riskScore": 28,
+    "activeShipments": 4,
+    "totalValue": 2800000
+  }
+]

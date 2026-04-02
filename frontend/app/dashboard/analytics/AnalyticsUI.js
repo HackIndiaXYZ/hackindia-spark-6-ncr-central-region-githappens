@@ -1,0 +1,205 @@
+'use client';
+import React, { useState } from 'react';
+import { 
+  BarChart3, TrendingUp, TrendingDown, Activity,
+  MapPin, ShieldAlert, ChevronRight, RotateCcw, Box, Globe, IndianRupee
+} from 'lucide-react';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, BarChart, Bar, Cell 
+} from 'recharts';
+import { motion } from 'framer-motion';
+
+export default function AnalyticsUI({ initialAnalytics }) {
+  const [analytics] = useState(initialAnalytics);
+  
+  const formatCurrency = (val) => {
+    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)}Cr`;
+    if (val >= 100000) return `₹${(val / 100000).toFixed(2)}L`;
+    return `₹${val.toLocaleString('en-IN')}`;
+  };
+
+  const getMetricIcon = (label) => {
+    switch (label) {
+      case 'Total Freight Cost': return <IndianRupee size={18} />;
+      case 'Logistics Efficiency': return <Activity size={18} />;
+      case 'Disruption Risk': return <ShieldAlert size={18} />;
+      default: return <BarChart3 size={18} />;
+    }
+  };
+
+  const dashboardStats = [
+    { label: 'Total Freight Cost', value: formatCurrency(analytics?.costBreakdown?.reduce((acc, curr) => acc + curr.value, 0) || 0), change: '+2.4%', up: false, color: 'text-white' },
+    { label: 'Logistics Efficiency', value: '94.2%', change: '+0.8%', up: true, color: 'text-primary' },
+    { label: 'Disruption Risk', value: 'High', change: '+12%', up: false, color: 'text-accent' },
+    { label: 'Active Trade Routes', value: '24', change: '+2', up: true, color: 'text-secondary' },
+  ];
+
+  return (
+    <div className="flex flex-col gap-10 animate-in">
+      
+      {/* ─── TOP METRICS ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+         {dashboardStats.map((stat, i) => (
+            <motion.div 
+               key={stat.label}
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: i * 0.1 }}
+               className="bg-[#0E141A]/60 backdrop-blur-xl border border-white/5 p-8 rounded-[40px] group hover:border-white/10 transition-all duration-300"
+            >
+               <div className="flex items-center justify-between mb-6">
+                  <div className={`p-4 rounded-3xl bg-white/5 ${stat.color} group-hover:scale-110 transition-transform`}>
+                     {getMetricIcon(stat.label)}
+                  </div>
+                  <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest ${stat.up ? 'text-primary' : 'text-accent'}`}>
+                     {stat.up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                     {stat.change}
+                  </div>
+               </div>
+               <div className="text-[10px] font-black text-[var(--text-muted)]/50 uppercase tracking-[0.2em] mb-2">{stat.label}</div>
+               <div className={`text-3xl font-black tracking-tight ${stat.color}`}>{stat.value}</div>
+            </motion.div>
+         ))}
+      </div>
+
+      {/* ─── MAIN ANALYTICS GRID ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+         
+         {/* COST TREND AREA CHART */}
+         <div className="lg:col-span-8 bg-[#0E141A] border border-white/5 rounded-[40px] p-10 relative overflow-hidden h-[500px]">
+            <div className="flex items-center justify-between relative z-10 mb-12">
+               <div>
+                  <h3 className="text-xl font-black tracking-tight text-white mb-2">Freight Cost Projections</h3>
+                  <p className="text-xs text-[var(--text-muted)] font-bold tracking-widest uppercase">Global Multi-Modal Analytics Matrix</p>
+               </div>
+               <div className="flex gap-4">
+                  <div className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">
+                     <Globe size={14} className="text-primary" />
+                     <span>Rupee Valuation Active</span>
+                  </div>
+               </div>
+            </div>
+            
+            <div className="h-full w-full pb-0">
+               <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={analytics?.monthlyCostTrend || []}>
+                     <defs>
+                        <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#00DAF3" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#00DAF3" stopOpacity={0}/>
+                        </linearGradient>
+                     </defs>
+                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                     <XAxis 
+                       dataKey="month" 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 10, fontWeight: 'bold' }} 
+                       dy={20}
+                     />
+                     <YAxis 
+                       hide 
+                       domain={['auto', 'auto']}
+                     />
+                     <Tooltip 
+                        contentStyle={{ backgroundColor: '#0E141A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '15px' }}
+                        itemStyle={{ color: '#00DAF3', fontSize: '12px', fontWeight: 'bold' }}
+                        labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 'black', letterSpacing: '0.1em' }}
+                        formatter={(val) => formatCurrency(val)}
+                     />
+                     <Area 
+                       type="monotone" 
+                       dataKey="cost" 
+                       stroke="#00DAF3" 
+                       strokeWidth={4}
+                       fillOpacity={1} 
+                       fill="url(#colorCost)" 
+                       animationDuration={2000}
+                     />
+                  </AreaChart>
+               </ResponsiveContainer>
+            </div>
+         </div>
+
+         {/* COST BREAKDOWN BAR CHART */}
+         <div className="lg:col-span-4 bg-gradient-to-b from-[#12161A] to-[#090F15] border border-white/5 rounded-[40px] p-10 h-[500px] flex flex-col">
+            <div className="mb-12">
+               <h3 className="text-xl font-black tracking-tight text-white mb-2">Cost Vectors</h3>
+               <p className="text-xs text-[var(--text-muted)] font-bold tracking-widest uppercase">Per Component Breakdown</p>
+            </div>
+            
+            <div className="flex-1 min-h-0">
+               <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics?.costBreakdown || []} layout="vertical" margin={{ left: -20 }}>
+                     <XAxis type="number" hide />
+                     <YAxis 
+                       type="category" 
+                       dataKey="name" 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 9, fontWeight: 'black', textTransform: 'uppercase' }} 
+                     />
+                     <Tooltip 
+                        cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                        contentStyle={{ backgroundColor: '#0E141A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px' }}
+                        formatter={(val) => formatCurrency(val)}
+                     />
+                     <Bar dataKey="value" radius={[0, 10, 10, 0]} barSize={24} animationDuration={1500}>
+                        {(analytics?.costBreakdown || []).map((entry, index) => (
+                           <Cell key={`cell-${index}`} fill={index === 0 ? '#00DAF3' : index === 1 ? '#FF8C00' : index === 2 ? '#FF3D00' : '#8B90A0'} />
+                        ))}
+                     </Bar>
+                  </BarChart>
+               </ResponsiveContainer>
+            </div>
+         </div>
+
+      </div>
+
+      {/* ─── BOTTOM ROW: REGIONAL PERFORMANCE ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-0">
+         
+         <div className="lg:col-span-2 bg-[#0E141A] border border-white/5 rounded-[40px] p-8 relative overflow-hidden">
+            <h3 className="text-sm font-black text-white/30 uppercase tracking-[0.2em] mb-6">Regional Reliability Topology</h3>
+            <div className="flex flex-col gap-6">
+               {(analytics?.regionPerformance || []).map((region, i) => (
+                  <div key={i} className="flex flex-col gap-3 group px-4 py-4 rounded-3xl hover:bg-white/[0.02] transition-all">
+                     <div className="flex justify-between items-center h-4">
+                        <div className="flex items-center gap-3">
+                           <div className={`w-2 h-2 rounded-full ${region.reliability > 80 ? 'bg-primary' : region.reliability > 70 ? 'bg-secondary' : 'bg-accent'}`}></div>
+                           <span className="text-sm font-bold text-white tracking-tight">{region.region}</span>
+                        </div>
+                        <div className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Avg Delay: {region.avgDelay}d</div>
+                     </div>
+                     <div className="flex items-center gap-4">
+                        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                           <motion.div 
+                             initial={{ width: 0 }}
+                             animate={{ width: `${region.reliability}%` }}
+                             transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
+                             className={`h-full ${region.reliability < 70 ? 'bg-accent' : 'bg-primary'}`}
+                           ></motion.div>
+                        </div>
+                        <span className="text-[10px] font-black text-primary uppercase w-12 text-right">{region.reliability}%</span>
+                     </div>
+                  </div>
+               ))}
+            </div>
+         </div>
+
+         <div className="lg:col-span-1 bg-gradient-to-br from-[#1C1215] to-[#0A0506] border border-white/5 rounded-[40px] p-8 flex flex-col items-center justify-center text-center group">
+            <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,61,0,0.25)] group-hover:scale-110 transition-transform duration-500 mb-6">
+               <RotateCcw className="text-accent" size={32} />
+            </div>
+            <h4 className="text-xl font-black tracking-tight text-white mb-2">Neural Stress Test</h4>
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-6 px-4 font-medium italic">Re-evaluate global cost impact with current volatility parameters.</p>
+            <button className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(255,61,0,0.2)] hover:scale-105 transition-transform">
+               Recalculate
+            </button>
+         </div>
+
+      </div>
+    </div>
+  );
+}
