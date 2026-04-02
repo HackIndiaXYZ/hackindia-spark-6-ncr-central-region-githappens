@@ -8,17 +8,20 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const getCarrierIcon = (carrier) => {
-  if (carrier.includes('Maersk') || carrier.includes('MSC')) return <Ship size={18} />;
-  if (carrier.includes('FedEx') || carrier.includes('DHL')) return <Plane size={18} />;
+  if (!carrier) return <Ship size={18} />;
+  const c = String(carrier);
+  if (c.includes('Maersk') || c.includes('MSC')) return <Ship size={18} />;
+  if (c.includes('FedEx') || c.includes('DHL')) return <Plane size={18} />;
   return <Ship size={18} />;
 };
 
 const getStatusColor = (status) => {
-  switch (status.toLowerCase()) {
-    case 'delayed': return 'bg-accent/20 text-accent border-accent/20';
-    case 'in transit': return 'bg-primary/20 text-primary border-primary/20';
+  const s = String(status || '').toLowerCase();
+  switch (s) {
+    case 'delayed': case 'critical': return 'bg-accent/20 text-accent border-accent/20';
+    case 'in transit': case 'on-time': return 'bg-primary/20 text-primary border-primary/20';
     case 'delivered': return 'bg-secondary/20 text-secondary border-secondary/20';
-    case 'pending': return 'bg-white/5 text-white/40 border-white/10';
+    case 'pending': case 'at-risk': return 'bg-white/5 text-white/40 border-white/10';
     default: return 'bg-white/5 text-white/40 border-white/10';
   }
 };
@@ -34,6 +37,7 @@ export default function ShipmentsList({ initialShipments }) {
   );
 
   const formatCurrency = (val) => {
+    if (!val || isNaN(val)) return '₹0.00';
     if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)}Cr`;
     if (val >= 100000) return `₹${(val / 100000).toFixed(2)}L`;
     return `₹${val.toLocaleString('en-IN')}`;
