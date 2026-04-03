@@ -211,8 +211,8 @@ function buildGreetingResponse(reply, decisionOut) {
     const bothOk    = weatherOk && newsOk;
     const noneOk    = !weatherOk && !newsOk;
 
-    const weatherStatus = weatherOk ? '✅ live'    : '⚠️ offline';
-    const newsStatus    = newsOk    ? '✅ live'    : '⚠️ offline';
+    const weatherStatus = weatherOk ? '✅ live' : `⚠️ ${apiHealth.weather || 'offline'}`;
+    const newsStatus    = newsOk    ? '✅ live' : `⚠️ ${apiHealth.news    || 'offline'}`;
 
     const recommendation = noneOk
       ? "Live feeds aren't available in this environment — but I can still help using your internal shipment and route data. Go ahead and ask!"
