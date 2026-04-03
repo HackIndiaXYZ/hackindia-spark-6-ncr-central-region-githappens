@@ -3,7 +3,6 @@
  * Fetches real-time supply chain context from external sources.
  */
 
-
 export async function getRelevantSignals(retrievedDocs) {
   const regions = new Set(
     retrievedDocs
@@ -12,8 +11,10 @@ export async function getRelevantSignals(retrievedDocs) {
   );
 
   const signals = [];
-  const weatherKey = process.env.WEATHER_API_KEY;
-  const newsKey = process.env.NEWS_API_KEY;
+  
+  // Robust env lookup
+  const weatherKey = (process.env.WEATHER_API_KEY || '').trim();
+  const newsKey    = (process.env.NEWS_API_KEY || '').trim();
   
   const apiHealth = {
     weather: weatherKey ? 'Key Found' : 'Missing WEATHER_API_KEY',
@@ -26,11 +27,11 @@ export async function getRelevantSignals(retrievedDocs) {
       const locQueries = [];
       if ([...regions].some(r => r.includes('Asia'))) locQueries.push('Shenzhen');
       if ([...regions].some(r => r.includes('Europe'))) locQueries.push('Rotterdam');
-      if (locQueries.length === 0) locQueries.push('London'); // Default polling
+      if (locQueries.length === 0) locQueries.push('London');
 
       let anySuccess = false;
       for (const loc of locQueries) {
-        // Use HTTPS for production safety
+        // Enforce HTTPS
         const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=${weatherKey}&q=${loc}&aqi=no`);
         if (res.ok) {
           anySuccess = true;
@@ -52,13 +53,12 @@ export async function getRelevantSignals(retrievedDocs) {
           }
         } else {
           const errData = await res.json().catch(() => ({}));
-          apiHealth.weather = `API Error: ${res.status} ${errData.error?.message || ''}`;
+          apiHealth.weather = `API Error: ${res.status} ${errData.error?.message || 'Unauthorized'}`;
         }
       }
       if (anySuccess) apiHealth.weather = 'Online (Live connection)';
     } catch (err) {
       apiHealth.weather = `Offline: ${err.message}`;
-      console.warn('WeatherAPI live fetch failed, skipping.');
     }
   }
 
@@ -90,15 +90,12 @@ export async function getRelevantSignals(retrievedDocs) {
         });
       } else {
         const errData = await res.json().catch(() => ({}));
-        apiHealth.news = `API Error: ${res.status} ${errData.message || ''}`;
+        apiHealth.news = `API Error: ${res.status} ${errData.message || 'Unauthorized/Limit'}`;
       }
     } catch (err) {
       apiHealth.news = `Offline: ${err.message}`;
-      console.warn('NewsAPI live fetch failed, skipping.');
     }
   }
-
-  // (Mock Demo Injections Removed by user request to strictly enforce real-time data constraints)
 
   return { signals, apiHealth };
 }

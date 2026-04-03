@@ -352,3 +352,5 @@ app.listen(PORT, () => {
   console.log(`  🤖 Navi Intel: POST http://localhost:${PORT}/api/navi/query`);
   console.log(`  🔄 Simulation: POST http://localhost:${PORT}/api/simulate\n`);
 });
+
+// Forced Redeploy Trigger: 2026-04-04 02:49:11
