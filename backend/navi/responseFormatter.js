@@ -198,20 +198,32 @@ function buildWhy(reasoning, recommendations, usedLLM, confidence) {
 
 // ── Greeting / status builder ─────────────────────────────────────────────────
 function buildGreetingResponse(reply, decisionOut) {
-  // For greetings, we return a lightweight friendly wrapper rather than full blocks
   const { apiHealth } = decisionOut;
 
   const isStatus = reply.toLowerCase().includes('status') ||
+                   reply.toLowerCase().includes('system check') ||
                    reply.toLowerCase().includes('weather') ||
                    reply.toLowerCase().includes('news');
 
   if (isStatus && apiHealth) {
-    const weatherStatus = apiHealth.weather?.includes('Online') ? '✅ connected' : '⚠️ offline';
-    const newsStatus    = apiHealth.news?.includes('Online')    ? '✅ connected' : '⚠️ offline';
+    const weatherOk = apiHealth.weather?.includes('Online');
+    const newsOk    = apiHealth.news?.includes('Online');
+    const bothOk    = weatherOk && newsOk;
+    const noneOk    = !weatherOk && !newsOk;
+
+    const weatherStatus = weatherOk ? '✅ live'    : '⚠️ offline';
+    const newsStatus    = newsOk    ? '✅ live'    : '⚠️ offline';
+
+    const recommendation = noneOk
+      ? "Live feeds aren't available in this environment — but I can still help using your internal shipment and route data. Go ahead and ask!"
+      : bothOk
+      ? "All feeds are live — go ahead and ask me about your shipments!"
+      : "Some feeds are limited, but I can still help with your available data.";
+
     return {
       situation: "Here's a quick system check for you:",
       impact: `Weather feed is ${weatherStatus} and news feed is ${newsStatus}.`,
-      recommendation: "Everything looks ready — go ahead and ask me about your shipments.",
+      recommendation,
       bestOption: null,
       why: null,
       isStatusCheck: true,

@@ -147,7 +147,7 @@ export function decisionAgent(query, retrievalOut, impactOut, llmResponse = null
   // ── Conversational / status queries → short rule-based reply ─────────────
   const qStr = query.toLowerCase().trim();
   const isGreeting = /^(hi|hello|hey|start|how are you|good morning)/i.test(qStr);
-  const isApiCheck = /\b(api|status|online|connection|working)\b/i.test(qStr);
+  const isApiCheck = /\b(api|status|online|connection|working|system)\b/i.test(qStr);
 
   if (isGreeting || isApiCheck) {
     let reply = "Hi! I'm Navi, your supply chain assistant. I'm online and ready to help.";
@@ -155,7 +155,19 @@ export function decisionAgent(query, retrievalOut, impactOut, llmResponse = null
     if (isApiCheck) {
       const weatherOk = apiHealth?.weather?.includes('Online');
       const newsOk    = apiHealth?.news?.includes('Online');
-      reply = `System is up and running! Weather data is ${weatherOk ? 'live ✅' : 'offline ⚠️'} and news feed is ${newsOk ? 'live ✅' : 'offline ⚠️'}. Everything looks good — ask me about your shipments!`;
+      const bothOk = weatherOk && newsOk;
+      const noneOk = !weatherOk && !newsOk;
+
+      let feedStatus;
+      if (bothOk) feedStatus = 'both live feeds are connected ✅';
+      else if (noneOk) feedStatus = 'live weather and news feeds are currently offline ⚠️ (API keys not configured in this environment)';
+      else feedStatus = `weather feed is ${weatherOk ? 'live ✅' : 'offline ⚠️'} and news feed is ${newsOk ? 'live ✅' : 'offline ⚠️'}`;
+
+      const closingNote = noneOk
+        ? "I can still answer questions using your internal supply chain data."
+        : "Ask me about your shipments anytime!";
+
+      reply = `System check: ${feedStatus}. ${closingNote}`;
     }
 
     return {
