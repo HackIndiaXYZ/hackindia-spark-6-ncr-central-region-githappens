@@ -12,13 +12,24 @@ export async function getRelevantSignals(retrievedDocs) {
 
   const signals = [];
   
-  // Robust env lookup
-  const weatherKey = (process.env.WEATHER_API_KEY || '').trim();
-  const newsKey    = (process.env.NEWS_API_KEY || '').trim();
+  // SMARTR-MATCH: Try every common naming convention to be absolutely sure
+  const weatherKey = (
+    process.env.WEATHER_API_KEY || 
+    process.env.WEATHERAPI_KEY || 
+    process.env.NEXT_PUBLIC_WEATHER_API_KEY || 
+    ''
+  ).trim();
+
+  const newsKey = (
+    process.env.NEWS_API_KEY || 
+    process.env.NEWSAPI_KEY || 
+    process.env.NEXT_PUBLIC_NEWS_API_KEY || 
+    ''
+  ).trim();
   
   const apiHealth = {
-    weather: weatherKey ? 'Key Found' : 'Missing WEATHER_API_KEY',
-    news: newsKey ? 'Key Found' : 'Missing NEWS_API_KEY'
+    weather: weatherKey ? 'Key Found' : 'Missing WEATHER_API_KEY (Not in Vercel Settings)',
+    news: newsKey ? 'Key Found' : 'Missing NEWS_API_KEY (Not in Vercel Settings)'
   };
 
   // 1. WeatherAPI Integration (Live)
@@ -31,13 +42,12 @@ export async function getRelevantSignals(retrievedDocs) {
 
       let anySuccess = false;
       for (const loc of locQueries) {
-        // Enforce HTTPS
         const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=${weatherKey}&q=${loc}&aqi=no`);
         if (res.ok) {
           anySuccess = true;
           const data = await res.json();
-          const condition = data.current.condition.text.toLowerCase();
-          const isSevere = condition.includes('storm') || condition.includes('hurricane') || data.current.wind_mph > 40;
+          const condition = (data.current?.condition?.text || '').toLowerCase();
+          const isSevere = condition.includes('storm') || condition.includes('hurricane') || data.current?.wind_mph > 40;
           
           if (isSevere || condition.includes('fog') || condition.includes('heavy') || condition.includes('rain')) {
              signals.push({
@@ -52,8 +62,12 @@ export async function getRelevantSignals(retrievedDocs) {
              });
           }
         } else {
-          const errData = await res.json().catch(() => ({}));
-          apiHealth.weather = `API Error: ${res.status} ${errData.error?.message || 'Unauthorized'}`;
+          try {
+            const errData = await res.json();
+            apiHealth.weather = `API Error: ${res.status} ${errData.error?.message || 'Rejected'}`;
+          } catch {
+            apiHealth.weather = `API Error: ${res.status} Connection rejected`;
+          }
         }
       }
       if (anySuccess) apiHealth.weather = 'Online (Live connection)';
@@ -71,7 +85,7 @@ export async function getRelevantSignals(retrievedDocs) {
         apiHealth.news = 'Online (Live sync)';
         const data = await res.json();
         data.articles?.forEach(article => {
-          const title = article.title.toLowerCase();
+          const title = (article.title || '').toLowerCase();
           let severity = 'low';
           if (title.includes('strike') || title.includes('attack') || title.includes('halt')) severity = 'critical';
           else if (title.includes('delay') || title.includes('divert') || title.includes('congestion')) severity = 'high';
@@ -89,8 +103,12 @@ export async function getRelevantSignals(retrievedDocs) {
           }
         });
       } else {
-        const errData = await res.json().catch(() => ({}));
-        apiHealth.news = `API Error: ${res.status} ${errData.message || 'Unauthorized/Limit'}`;
+        try {
+          const errData = await res.json();
+          apiHealth.news = `API Error: ${res.status} ${errData.message || 'Rejected'}`;
+        } catch {
+          apiHealth.news = `API Error: ${res.status} Connection rejected`;
+        }
       }
     } catch (err) {
       apiHealth.news = `Offline: ${err.message}`;
