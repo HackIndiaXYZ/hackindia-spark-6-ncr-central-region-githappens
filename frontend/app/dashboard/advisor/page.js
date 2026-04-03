@@ -199,9 +199,9 @@ export default function AdvisorPage() {
       id: 1,
       role: 'assistant',
       friendly: {
-        situation: "Hi! I'm Navi, your supply chain assistant. I'm connected to your logistics data and live weather and news feeds.",
+        situation: "Hi! I'm Navi, your supply chain assistant. I can help you track shipments, spot disruptions, and find the best routes.",
         impact: null,
-        recommendation: "Ask me anything — from checking your shipments to finding the best route around a disruption.",
+        recommendation: "Ask me anything — about delays, costs, routes, or what's happening right now in your supply chain.",
         bestOption: null,
         why: null,
         isGreeting: true
@@ -213,9 +213,11 @@ export default function AdvisorPage() {
   const [isTyping, setIsTyping]   = useState(false);
   const chatEndRef                 = useRef(null);
 
+  const DEMO_CHIP = "Storm affecting shipments — best route?";
+
   const chips = [
     "Check system status",
-    "Storm detected — what's the best route?",
+    DEMO_CHIP,
     "What shipments are delayed?",
     "How can I reduce costs?",
   ];
@@ -232,7 +234,7 @@ export default function AdvisorPage() {
 
     try {
       let response;
-      if (queryText === "Storm detected — what's the best route?") {
+      if (queryText === DEMO_CHIP) {
         response = await api.loadNaviDemo();
       } else {
         response = await api.queryNavi(queryText);
