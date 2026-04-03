@@ -16,8 +16,8 @@ export async function getRelevantSignals(retrievedDocs) {
   const newsKey = process.env.NEWS_API_KEY;
   
   const apiHealth = {
-    weather: 'Unconfigured / Fallback Mode',
-    news: 'Unconfigured / Fallback Mode'
+    weather: weatherKey ? 'Key Found' : 'Missing WEATHER_API_KEY',
+    news: newsKey ? 'Key Found' : 'Missing NEWS_API_KEY'
   };
 
   // 1. WeatherAPI Integration (Live)
@@ -30,7 +30,8 @@ export async function getRelevantSignals(retrievedDocs) {
 
       let anySuccess = false;
       for (const loc of locQueries) {
-        const res = await fetch(`http://api.weatherapi.com/v1/current.json?key=${weatherKey}&q=${loc}&aqi=no`);
+        // Use HTTPS for production safety
+        const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=${weatherKey}&q=${loc}&aqi=no`);
         if (res.ok) {
           anySuccess = true;
           const data = await res.json();
@@ -49,11 +50,14 @@ export async function getRelevantSignals(retrievedDocs) {
                timestamp: new Date().toISOString()
              });
           }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          apiHealth.weather = `API Error: ${res.status} ${errData.error?.message || ''}`;
         }
       }
-      apiHealth.weather = anySuccess ? 'Online (Polling active)' : 'API Error (Bad Request)';
+      if (anySuccess) apiHealth.weather = 'Online (Live connection)';
     } catch (err) {
-      apiHealth.weather = 'Offline (Connection Failed)';
+      apiHealth.weather = `Offline: ${err.message}`;
       console.warn('WeatherAPI live fetch failed, skipping.');
     }
   }
@@ -85,10 +89,11 @@ export async function getRelevantSignals(retrievedDocs) {
           }
         });
       } else {
-        apiHealth.news = 'API Error (Unauthorized or Quota Exceeded)';
+        const errData = await res.json().catch(() => ({}));
+        apiHealth.news = `API Error: ${res.status} ${errData.message || ''}`;
       }
     } catch (err) {
-      apiHealth.news = 'Offline (Connection Failed)';
+      apiHealth.news = `Offline: ${err.message}`;
       console.warn('NewsAPI live fetch failed, skipping.');
     }
   }
