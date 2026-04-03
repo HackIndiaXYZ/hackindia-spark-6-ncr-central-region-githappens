@@ -2,6 +2,8 @@ import React, { Suspense } from 'react';
 import { getBaseUrl } from '@/lib/api-server';
 import CommandCenterUI from './CommandCenterUI';
 
+export const dynamic = 'force-dynamic';
+
 // This is a Server Component in Next.js 15
 export default async function DashboardPage() {
   const baseUrl = await getBaseUrl();

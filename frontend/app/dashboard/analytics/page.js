@@ -2,6 +2,8 @@ import React, { Suspense } from 'react';
 import { getBaseUrl } from '@/lib/api-server';
 import AnalyticsUI from './AnalyticsUI';
 
+export const dynamic = 'force-dynamic';
+
 // Next.js 15 Server Component
 export default async function AnalyticsPage() {
   let baseUrl = 'unresolved';

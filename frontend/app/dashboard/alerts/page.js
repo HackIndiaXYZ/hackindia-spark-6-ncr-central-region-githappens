@@ -2,6 +2,8 @@ import React, { Suspense } from 'react';
 import { getBaseUrl } from '@/lib/api-server';
 import AlertsList from './AlertsList';
 
+export const dynamic = 'force-dynamic';
+
 // Next.js 15 Server Component
 export default async function AlertsPage() {
   const baseUrl = await getBaseUrl();
