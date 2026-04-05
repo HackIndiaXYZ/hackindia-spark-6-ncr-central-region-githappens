@@ -59,7 +59,7 @@ function FriendlyResponseCard({ friendly, impact, recommendations, bestRoute, al
           <div className="flex flex-col gap-4">
             {recommendations.slice(0, 3).map((rec, i) => (
               <div key={i} className="flex gap-4 items-start group/rec">
-                <div className="mt-1 flex items-center justify-center w-5 h-5 rounded-lg bg-surface-high border border-border/20 text-[10px] font-bold text-text-muted transition-colors group-hover/rec:text-primary group-hover/rec:border-primary/30">
+                <div className="mt-1 flex items-center justify-center w-5 h-5 rounded-lg bg-blue-50 border border-blue-100 text-[10px] font-bold text-blue-600 transition-colors group-hover/rec:bg-blue-600 group-hover/rec:text-white">
                   {i + 1}
                 </div>
                 <div className="flex-1">
@@ -86,10 +86,10 @@ function EmptyState({ onSelectSuggestion }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center pt-8 pb-4">
-      <div className="w-12 h-12 rounded-2xl bg-surface-high border border-primary/20 flex items-center justify-center mb-4 shadow-xl animate-in">
-        <Cpu size={24} className="text-primary" />
+      <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-4 shadow-sm animate-in">
+        <Zap size={24} className="text-blue-600" />
       </div>
-      <h2 className="text-3xl font-black tracking-tighter text-foreground mb-10 text-center animate-in">How can I help you, Administrator?</h2>
+      <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-10 text-center animate-in">Hi, I'm Navi. How can I help with your supply chain today?</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl animate-in" style={{ animationDelay: '0.1s' }}>
         {suggestions.map((s, i) => (
@@ -132,9 +132,9 @@ export default function AdvisorPage() {
       id: 1,
       role: 'assistant',
       friendly: {
-        situation: "Awaiting your directive. I am Navi AI, your conversational interface for the Terminal logistics network.",
+        situation: "Hi there! I'm Navi, your AI Supply Advisor. I'm here to help you spot disruptions and find the best ways to keep your shipments moving smoothly.",
         impact: null,
-        recommendation: "You can query me for real-time status updates, cost optimization strategies, or hypothetical re-routing scenarios.",
+        recommendation: "You can ask me things like 'What's the status of my routes?' or 'Are any shipments delayed by weather?'",
         bestOption: null,
         why: null,
         isGreeting: true
@@ -193,8 +193,7 @@ export default function AdvisorPage() {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        isError: true,
-        rawContent: `Neural link instability detected: ${err.message}. Re-establishing connection…`
+        rawContent: `I'm having a little trouble connecting right now. Let me try again in a moment.`
       }]);
     } finally {
       setIsTyping(false);
@@ -224,14 +223,14 @@ export default function AdvisorPage() {
       {/* Subtle Header */}
       <div className="py-4 border-b border-border/5 flex items-center justify-between px-6">
         <div className="flex items-center gap-3">
-           <div className="w-8 h-8 rounded-lg bg-surface-high border border-primary/20 flex items-center justify-center shadow-sm">
-              <Cpu size={18} className="text-primary" />
+           <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm">
+              <Zap size={18} className="text-blue-600" />
            </div>
            <div>
-             <h1 className="text-sm font-bold tracking-tight text-foreground">Navi AI</h1>
+             <h1 className="text-sm font-bold tracking-tight text-gray-900">Navi AI Advisor</h1>
              <div className="flex items-center gap-2">
-                <span className="text-[8px] font-black text-text-muted uppercase tracking-[0.2em] opacity-40">System v4.0.2</span>
-                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest opacity-60">Ready to help</span>
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
              </div>
            </div>
         </div>
@@ -328,11 +327,11 @@ export default function AdvisorPage() {
         </AnimatePresence>
         {/* Typing indicator */}
         {isTyping && (
-          <div className="flex items-center gap-4 text-primary animate-pulse py-2 px-10">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-               <Sparkles size={16} />
+          <div className="flex items-center gap-4 text-blue-600 py-2 px-10">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+               <Sparkles size={16} className="animate-pulse" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Neural link actively processing…</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">Navi is thinking...</span>
           </div>
         )}
         <div ref={chatEndRef} className="h-6" />
@@ -384,8 +383,8 @@ export default function AdvisorPage() {
 
           {/* Footer Disclaimer */}
           <div className="mt-4 text-center">
-            <span className="text-[10px] text-text-muted opacity-30 font-bold uppercase tracking-[0.3em]">
-              Navi AI v4.0 · Cognitive Logistics Core
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest opacity-60">
+              Navi AI — Your Supply Chain Advisor
             </span>
           </div>
         </div>
