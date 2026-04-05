@@ -5,15 +5,6 @@ Next-Generation Supply Chain Resilience Platform featuring the **Navi Multi-Agen
 ## 🏗️ Architecture
 - **Frontend**: Next.js 15, Tailwind CSS, Lucide, Recharts, Framer Motion.
 - **Backend**: Express.js, Navi AI Pipeline (RAG + Agents), weather/news API integration.
-
-2. **Setup Environment**:
-   - Copy `backend/.env.example` to `backend/.env` and add your API keys.
-   - Copy `frontend/.env.example` to `frontend/.env` (optional, defaults to localhost:5000).
-
-3. **Run Development Server**:
-   ```bash
-   npm run dev
-   ```
    - Frontend: [http://localhost:3000](http://localhost:3000)
    - Backend API: [http://localhost:5000](http://localhost:5000)
 
