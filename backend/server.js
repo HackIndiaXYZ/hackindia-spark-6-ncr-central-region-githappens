@@ -38,11 +38,21 @@ const suppliers = loadData('suppliers.json');
 // ─── Auth (Mock) ───────────────────────────────────────────────
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
+  
+  // Special Admin Account for Demo
+  if (email === 'admin@supplyalert.ai' && password === 'admin123') {
+    return res.json({
+      success: true,
+      user: { id: 'admin-001', name: 'System Administrator', email, role: 'ADMIN', avatar: null },
+      token: 'mock-admin-token-' + Date.now()
+    });
+  }
+
   if (email && password) {
     res.json({
       success: true,
       user: { id: 'usr-001', name: 'Alex Morgan', email, role: 'Operations Manager', avatar: null },
-      token: 'mock-jwt-token-' + Date.now()
+      token: 'mock-user-token-' + Date.now()
     });
   } else {
     res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -55,10 +65,52 @@ app.post('/api/auth/signup', (req, res) => {
     res.json({
       success: true,
       user: { id: 'usr-' + Date.now(), name, email, role: 'Analyst', avatar: null },
-      token: 'mock-jwt-token-' + Date.now()
+      token: 'mock-user-token-' + Date.now()
     });
   } else {
     res.status(400).json({ success: false, message: 'All fields required' });
+  }
+});
+
+// ─── Admin Tools ──────────────────────────────────────────────
+app.post('/api/admin/import', (req, res) => {
+  const { type, data } = req.body; // type: 'shipments' | 'suppliers' | 'disruptions'
+  const authHeader = req.headers.authorization;
+
+  // Simple token check for demo
+  if (!authHeader || !authHeader.includes('admin')) {
+    return res.status(403).json({ success: false, message: 'Admin privileges required' });
+  }
+
+  if (!['shipments', 'suppliers', 'disruptions'].includes(type) || !Array.isArray(data)) {
+    return res.status(400).json({ success: false, message: 'Invalid import format. Expected {type, data: []}' });
+  }
+
+  try {
+    const filePath = join(__dirname, 'data', `${type}.json`);
+    const currentData = JSON.parse(readFileSync(filePath, 'utf-8'));
+    
+    // Append and remove duplicates by ID if exists
+    const newData = [...data, ...currentData];
+    const uniqueData = Array.from(new Map(newData.map(item => [item.id || Math.random(), item])).values());
+
+    writeFileSync(filePath, JSON.stringify(uniqueData, null, 2));
+    
+    // Update in-memory arrays
+    if (type === 'shipments') shipments.splice(0, shipments.length, ...uniqueData);
+    if (type === 'suppliers') suppliers.splice(0, suppliers.length, ...uniqueData);
+    if (type === 'disruptions') disruptions.splice(0, disruptions.length, ...uniqueData);
+
+    console.log(`[ADMIN] Imported ${data.length} records into ${type}`);
+
+    res.json({ 
+      success: true, 
+      message: `Successfully imported ${data.length} ${type} records.`,
+      count: data.length
+    });
+  } catch (err) {
+    console.error('[ADMIN] Import failed:', err);
+    res.status(500).json({ success: false, message: 'Import failed during processing', error: err.message });
   }
 });
 
@@ -274,12 +326,12 @@ app.get('/api/analytics', (req, res) => {
       { month: 'Feb', delays: 30, onTime: 70 },
       { month: 'Mar', delays: 35, onTime: 65 }
     ],
-    riskDistribution: [
-      { name: 'Weather', value: 35, color: '#3b82f6' },
-      { name: 'Congestion', value: 25, color: '#f59e0b' },
-      { name: 'Geopolitical', value: 20, color: '#ef4444' },
-      { name: 'Infrastructure', value: 12, color: '#8b5cf6' },
-      { name: 'Supplier', value: 8, color: '#10b981' }
+    costBreakdown: [
+      { name: 'Weather', value: 3500000, color: '#3b82f6' },
+      { name: 'Congestion', value: 2500000, color: '#f59e0b' },
+      { name: 'Geopolitical', value: 2000000, color: '#ef4444' },
+      { name: 'Infrastructure', value: 1200000, color: '#8b5cf6' },
+      { name: 'Supplier', value: 800000, color: '#10b981' }
     ],
     regionPerformance: [
       { region: 'Asia Pacific', reliability: 72, avgDelay: 4.2, shipments: 340 },
@@ -288,13 +340,13 @@ app.get('/api/analytics', (req, res) => {
       { region: 'Middle East', reliability: 65, avgDelay: 5.5, shipments: 120 },
       { region: 'South America', reliability: 81, avgDelay: 2.4, shipments: 95 }
     ],
-    costTrend: [
-      { month: 'Oct', actual: 2100000, projected: 1800000 },
-      { month: 'Nov', actual: 2800000, projected: 1900000 },
-      { month: 'Dec', actual: 3200000, projected: 2000000 },
-      { month: 'Jan', actual: 2900000, projected: 2100000 },
-      { month: 'Feb', actual: 4100000, projected: 2200000 },
-      { month: 'Mar', actual: 4800000, projected: 2300000 }
+    monthlyCostTrend: [
+      { month: 'Oct', cost: 2100000, projected: 1800000 },
+      { month: 'Nov', cost: 2800000, projected: 1900000 },
+      { month: 'Dec', cost: 3200000, projected: 2000000 },
+      { month: 'Jan', cost: 2900000, projected: 2100000 },
+      { month: 'Feb', cost: 4100000, projected: 2200000 },
+      { month: 'Mar', cost: 4800000, projected: 2300000 }
     ],
     kpis: {
       totalShipmentsMonitored: 1045,

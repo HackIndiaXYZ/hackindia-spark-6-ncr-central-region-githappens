@@ -4,29 +4,36 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, MessageSquareText, Activity, ShieldAlert, 
-  Settings, LogOut, BarChart3, Box, AlertTriangle, Home
+  Settings, LogOut, BarChart3, Box, AlertTriangle, Home, Database, Cpu
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout, isAdmin } = useAuth();
 
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/dashboard', icon: LayoutDashboard, label: 'Command Center' },
-    { path: '/dashboard/advisor', icon: MessageSquareText, label: 'Navi AI' },
+    { path: '/dashboard/advisor', icon: Cpu, label: 'Navi AI' },
     { path: '/dashboard/simulation', icon: Activity, label: 'Simulation' },
     { path: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/dashboard/shipments', icon: Box, label: 'Shipments' },
     { path: '/dashboard/alerts', icon: AlertTriangle, label: 'Alerts' },
   ];
 
+  // Add Admin items if user is ADMIN
+  if (isAdmin) {
+    navItems.push({ path: '/dashboard/admin/import', icon: Database, label: 'Data Import' });
+  }
+
   return (
     <aside className={`${collapsed ? 'w-20' : 'w-72'} bg-surface border-r border-border h-full flex flex-col pt-10 pb-8 shrink-0 z-50 transition-all duration-300 ease-in-out relative group shadow-[4px_0_24px_rgba(0,0,0,0.02)]`}>
       {/* Brand Header */}
-      <div className="flex items-center gap-4 px-10 mb-16 overflow-hidden whitespace-nowrap">
+      <div className="flex items-center gap-4 px-10 mb-8 overflow-hidden whitespace-nowrap">
         <div className="w-12 h-12 rounded-2xl bg-surface-high border border-border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
           <Image src="/logo.png" alt="SupplyAlert Logo" width={32} height={32} className="object-contain" />
         </div>
@@ -46,7 +53,7 @@ const Sidebar = () => {
               key={item.path} 
               href={item.path} 
               title={collapsed ? item.label : ''}
-              className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 group/item relative ${isActive 
+              className={`flex items-center gap-4 px-5 py-2.5 rounded-2xl transition-all duration-300 group/item relative ${isActive 
                 ? 'bg-primary/5 text-primary' 
                 : 'text-gray-500 hover:text-foreground hover:bg-surface-high'}`}
             >
@@ -66,12 +73,26 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer Actions */}
-      <div className="flex flex-col gap-2 px-6 border-t border-border pt-8 mt-6">
-        <Link href="/dashboard/settings" className="flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all text-gray-400 hover:text-foreground hover:bg-surface-high font-semibold text-[13px] tracking-tight">
+      <div className="flex flex-col gap-1 px-6 border-t border-border pt-4 mt-2">
+        <div className={`px-5 py-1 mb-1 flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
+           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 uppercase">
+              {user?.name?.charAt(0) || 'U'}
+           </div>
+           {!collapsed && (
+             <div className="flex flex-col overflow-hidden">
+                <span className="text-[11px] font-bold text-foreground truncate">{user?.name || 'User Session'}</span>
+                <span className="text-[9px] font-bold text-text-muted uppercase tracking-tighter">{user?.role || 'Guest'}</span>
+             </div>
+           )}
+        </div>
+        <Link href="/dashboard/settings" className="flex items-center gap-4 px-5 py-2.5 rounded-2xl transition-all text-gray-400 hover:text-foreground hover:bg-surface-high font-semibold text-[13px] tracking-tight">
           <Settings size={18} className="shrink-0 opacity-60" />
           <span className={`transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Settings</span>
         </Link>
-        <button className="flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all text-gray-400 hover:text-red-500 hover:bg-red-500/10 font-semibold text-[13px] tracking-tight">
+        <button 
+          onClick={logout}
+          className="flex items-center gap-4 px-5 py-2.5 rounded-2xl transition-all text-gray-400 hover:text-red-500 hover:bg-red-500/10 font-semibold text-[13px] tracking-tight w-full text-left"
+        >
           <LogOut size={18} className="shrink-0 opacity-60" />
           <span className={`transition-opacity duration-300 ${collapsed ? 'opacity-0' : 'opacity-100'}`}>Logout</span>
         </button>

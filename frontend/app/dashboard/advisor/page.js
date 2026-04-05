@@ -5,186 +5,119 @@ import {
   Send, User, Trash2, Download,
   ChevronDown, ChevronUp, Zap, Sparkles,
   Search, ShieldCheck, AlertTriangle,
-  CloudLightning, Route, Lightbulb, CheckCircle2, HelpCircle
+  CloudLightning, Route, Lightbulb, CheckCircle2, HelpCircle,
+  Cpu, FlaskConical, Activity, Clock, Database, Plus, Paperclip
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 
-// ─── Friendly response card ────────────────────────────────────────────────────
+// ─── Friendly response card (Minimalist ChatGPT Style) ────────────────────────
 function FriendlyResponseCard({ friendly, impact, recommendations, bestRoute, alternatives }) {
-  const hasFullData = friendly && (friendly.impact || friendly.recommendation || friendly.bestOption);
-
-  if (!hasFullData) {
-    return (
-      <div className="mt-4 p-4 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl text-[var(--text-muted)] text-sm">
-        {friendly?.situation || "I'm processing your request…"}
-      </div>
-    );
-  }
-
-  const blocks = [
-    {
-      key: 'situation',
-      icon: <Lightbulb size={14} />,
-      label: "What's happening",
-      text: friendly.situation,
-      color: 'var(--primary)'
-    },
-    {
-      key: 'impact',
-      icon: <AlertTriangle size={14} />,
-      label: 'Impact',
-      text: friendly.impact,
-      color: impact?.level === 'Critical' ? 'var(--accent)' : impact?.level === 'High' ? '#f59e0b' : 'var(--primary)'
-    },
-    {
-      key: 'recommendation',
-      icon: <CheckCircle2 size={14} />,
-      label: 'Recommendation',
-      text: friendly.recommendation,
-      color: '#10b981'
-    },
-    {
-      key: 'bestOption',
-      icon: <Route size={14} />,
-      label: 'Best Option',
-      text: friendly.bestOption,
-      color: 'var(--secondary)'
-    },
-    {
-      key: 'why',
-      icon: <HelpCircle size={14} />,
-      label: 'Why',
-      text: friendly.why,
-      color: 'var(--text-muted)'
-    }
-  ].filter(b => b.text);
-
-  return (
-    <div className="mt-5 flex flex-col gap-3">
-      {/* Impact chips */}
-      {impact && (
-        <div className="flex gap-2 flex-wrap mb-1">
-          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-            impact.level === 'Critical' ? 'bg-red-500/15 border-red-500/40 text-red-400'
-            : impact.level === 'High'   ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
-            : impact.level === 'Medium' ? 'bg-blue-500/15 border-blue-500/40 text-blue-400'
-            : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-          }`}>
-            {impact.level} Risk
-          </span>
-          {impact.maxDelayDays > 0 && (
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-[var(--border-muted)] text-[var(--text-muted)]">
-              ⏱ Up to {impact.maxDelayDays}d delay
-            </span>
-          )}
-          {impact.costFormatted && impact.costFormatted !== '₹0' && (
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-[var(--border-muted)] text-[var(--text-muted)]">
-              💰 {impact.costFormatted} exposure
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Friendly structured blocks */}
-      {blocks.map((block) => (
-        <div
-          key={block.key}
-          className="flex gap-3 p-4 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl"
-        >
-          <div
-            className="shrink-0 w-7 h-7 rounded-xl flex items-center justify-center mt-0.5"
-            style={{ background: `${block.color}18`, color: block.color }}
-          >
-            {block.icon}
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <div
-              className="text-[9px] font-black uppercase tracking-[0.15em]"
-              style={{ color: block.color }}
-            >
-              {block.label}
-            </div>
-            <div className="text-sm text-[var(--text-primary)] leading-relaxed">
-              {block.text}
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Top 2 recommendations */}
-      {recommendations?.length > 0 && (
-        <div className="p-4 bg-[var(--surface-high)] border border-[var(--border-muted)] rounded-2xl">
-          <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-3 flex items-center gap-1.5">
-            <Zap size={11} /> Action Checklist
-          </div>
-          <div className="flex flex-col gap-2">
-            {recommendations.slice(0, 3).map((rec, i) => (
-              <div key={i} className="flex gap-2 items-start">
-                <div className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${
-                  rec.priority === 'IMMEDIATE' ? 'bg-red-400 animate-pulse'
-                  : rec.priority === 'HIGH'    ? 'bg-amber-400'
-                  : 'bg-[var(--primary)]'
-                }`} />
-                <div>
-                  <div className="text-xs font-semibold text-[var(--text-primary)] leading-tight">{rec.action}</div>
-                  {rec.timeframe && (
-                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{rec.timeframe}</div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Alternatives */}
-      {alternatives?.length > 0 && (
-        <div className="p-4 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl">
-          <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-3">
-            Other Options
-          </div>
-          <div className="flex flex-col gap-2">
-            {alternatives.map((alt, i) => (
-              <div key={i} className="flex gap-2 items-start text-xs text-[var(--text-secondary)]">
-                <span className="shrink-0 text-[var(--text-muted)]">•</span>
-                <div>
-                  <span className="font-semibold text-[var(--text-primary)]">{alt.name}</span>
-                  {' — '}{alt.description}
-                  {alt.costDelta && <span className="ml-1 text-[var(--text-muted)]">({alt.costDelta})</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Greeting / status card ────────────────────────────────────────────────────
-function GreetingCard({ friendly }) {
   if (!friendly) return null;
+
   return (
-    <div className="mt-3 p-4 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl text-sm text-[var(--text-secondary)] leading-relaxed">
-      {friendly.impact && (
-        <div className="mt-2 text-[var(--text-muted)] text-xs">{friendly.impact}</div>
+    <div className="flex flex-col gap-6 text-[15px] leading-relaxed text-foreground">
+      {/* Main Situation */}
+      <div className="font-medium">
+        {friendly.situation}
+      </div>
+
+      {/* Impact & Analysis Grid */}
+      {(friendly.impact || friendly.recommendation || friendly.bestOption) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+          {friendly.impact && (
+            <div className="flex flex-col gap-1.5 group">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-accent opacity-70 group-hover:opacity-100 transition-opacity">
+                <AlertTriangle size={12} /> Operational Impact
+              </div>
+              <div className="text-sm font-medium opacity-90">{friendly.impact}</div>
+            </div>
+          )}
+          {friendly.recommendation && (
+            <div className="flex flex-col gap-1.5 group">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-secondary opacity-70 group-hover:opacity-100 transition-opacity">
+                <CheckCircle2 size={12} /> Strategic Directive
+              </div>
+              <div className="text-sm font-medium opacity-90">{friendly.recommendation}</div>
+            </div>
+          )}
+          {friendly.bestOption && (
+            <div className="flex flex-col gap-1.5 group">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary opacity-70 group-hover:opacity-100 transition-opacity">
+                <Route size={12} /> Optimal Path
+              </div>
+              <div className="text-sm font-medium opacity-90">{friendly.bestOption}</div>
+            </div>
+          )}
+        </div>
       )}
-      {friendly.recommendation && (
-        <div className="mt-2 text-[var(--text-primary)] text-xs font-medium">{friendly.recommendation}</div>
+
+      {/* Checklist */}
+      {recommendations?.length > 0 && (
+        <div className="mt-4 pt-6 border-t border-border/10">
+          <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.25em] mb-4">Tactical Response Protocol</div>
+          <div className="flex flex-col gap-4">
+            {recommendations.slice(0, 3).map((rec, i) => (
+              <div key={i} className="flex gap-4 items-start group/rec">
+                <div className="mt-1 flex items-center justify-center w-5 h-5 rounded-lg bg-surface-high border border-border/20 text-[10px] font-bold text-text-muted transition-colors group-hover/rec:text-primary group-hover/rec:border-primary/30">
+                  {i + 1}
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-foreground">{rec.action}</div>
+                  {rec.timeframe && <div className="text-[11px] text-text-muted font-medium italic opacity-60">{rec.timeframe}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-// ─── Pipeline stepper ─────────────────────────────────────────────────────────
+// ─── Greeting / centered empty state ──────────────────────────────────────────
+function EmptyState({ onSelectSuggestion }) {
+  const suggestions = [
+    { title: "Network Status Check", desc: "Scan global ports & routes for anomalies", icon: <Activity size={18} /> },
+    { title: "Storm Route Impact", desc: "Analyze how current weather hits active shipments", icon: <CloudLightning size={18} /> },
+    { title: "Optimize Cost Vectors", desc: "Find low-risk paths for freight rate reduction", icon: <Zap size={18} /> },
+    { title: "High-Risk Shipment Audit", desc: "Identify cargo facing tier-1 disruption threats", icon: <ShieldCheck size={18} /> },
+  ];
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center pt-8 pb-4">
+      <div className="w-12 h-12 rounded-2xl bg-surface-high border border-primary/20 flex items-center justify-center mb-4 shadow-xl animate-in">
+        <Cpu size={24} className="text-primary" />
+      </div>
+      <h2 className="text-3xl font-black tracking-tighter text-foreground mb-10 text-center animate-in">How can I help you, Administrator?</h2>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl animate-in" style={{ animationDelay: '0.1s' }}>
+        {suggestions.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => onSelectSuggestion(s.title)}
+            className="flex flex-col gap-3 p-5 bg-surface-high/50 border border-border/10 rounded-2xl hover:border-primary/40 hover:bg-surface-high transition-all text-left group min-h-[140px] shadow-sm"
+          >
+            <div className="text-primary p-2 w-fit rounded-lg bg-primary/5 group-hover:scale-110 transition-transform">{s.icon}</div>
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">{s.title}</div>
+              <div className="text-[10px] font-medium text-text-muted mt-2 leading-relaxed opacity-60 line-clamp-2 leading-snug">{s.desc}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Pipeline steps (Subtle inline version) ──────────────────────────────────
 function PipelineSteps({ pipeline }) {
   if (!pipeline?.length) return null;
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
+    <div className="mt-6 flex flex-wrap gap-2 pt-4 border-t border-border/5 opacity-50 hover:opacity-80 transition-opacity">
       {pipeline.map((step, i) => (
-        <div key={i} className="flex items-center gap-1.5 px-2 py-1 bg-[var(--surface)] border border-[var(--border-muted)] rounded-xl text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">
-          <div className={`w-1.5 h-1.5 rounded-full ${step.status === 'complete' ? 'bg-emerald-400' : 'bg-[var(--border-muted)]'}`} />
+        <div key={i} className="flex items-center gap-2 px-3 py-1 bg-surface-high border border-border/10 rounded-full text-[8px] font-black text-text-muted uppercase tracking-widest">
+          <div className={`w-1.5 h-1.5 rounded-full ${step.status === 'complete' ? 'bg-primary' : 'bg-border'}`} />
           {step.agent}
         </div>
       ))}
@@ -199,9 +132,9 @@ export default function AdvisorPage() {
       id: 1,
       role: 'assistant',
       friendly: {
-        situation: "Hi! I'm Navi, your supply chain assistant. I can help you track shipments, spot disruptions, and find the best routes.",
+        situation: "Awaiting your directive. I am Navi AI, your conversational interface for the Terminal logistics network.",
         impact: null,
-        recommendation: "Ask me anything — about delays, costs, routes, or what's happening right now in your supply chain.",
+        recommendation: "You can query me for real-time status updates, cost optimization strategies, or hypothetical re-routing scenarios.",
         bestOption: null,
         why: null,
         isGreeting: true
@@ -213,13 +146,11 @@ export default function AdvisorPage() {
   const [isTyping, setIsTyping]   = useState(false);
   const chatEndRef                 = useRef(null);
 
-  const DEMO_CHIP = "Storm affecting shipments — best route?";
-
   const chips = [
-    "Check system status",
-    DEMO_CHIP,
-    "What shipments are delayed?",
-    "How can I reduce costs?",
+    "System Status Check",
+    "Storm impact on routes?",
+    "High-risk shipments",
+    "Cost reduction vector",
   ];
 
   const handleSend = async (e, textOverride = '') => {
@@ -234,7 +165,7 @@ export default function AdvisorPage() {
 
     try {
       let response;
-      if (queryText === DEMO_CHIP) {
+      if (queryText.includes("Storm")) {
         response = await api.loadNaviDemo();
       } else {
         response = await api.queryNavi(queryText);
@@ -243,9 +174,7 @@ export default function AdvisorPage() {
       const assistantMsg = {
         id: Date.now() + 1,
         role: 'assistant',
-        // Friendly formatted response (from responseFormatter.js)
         friendly: response.friendlyResponse || null,
-        // Raw data for chips / extras
         impact:          response.impact,
         recommendations: response.recommendations,
         bestRoute:       response.bestRoute,
@@ -254,8 +183,7 @@ export default function AdvisorPage() {
         reasoning:       response.reasoning,
         usedLLM:         response.usedLLM,
         confidence:      response.confidence,
-        // Legacy fallback for non-formatter responses
-        rawContent: response.conversationalReply || response.situationSummary || 'Analysis complete.',
+        rawContent: response.conversationalReply || response.situationSummary || 'Telemetry synchronization complete.',
         showPipeline: false
       };
 
@@ -266,7 +194,7 @@ export default function AdvisorPage() {
         id: Date.now() + 1,
         role: 'assistant',
         isError: true,
-        rawContent: `Something went wrong: ${err.message}. Please try again in a moment.`
+        rawContent: `Neural link instability detected: ${err.message}. Re-establishing connection…`
       }]);
     } finally {
       setIsTyping(false);
@@ -279,198 +207,187 @@ export default function AdvisorPage() {
     ));
   };
 
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    setShowScrollBtn(scrollHeight - scrollTop > clientHeight + 100);
+  };
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] max-w-5xl mx-auto animate-in">
+    <div className="flex flex-col h-[calc(100vh-112px)] max-w-4xl mx-auto animate-in overflow-hidden relative">
 
-      {/* Header */}
-      <div className="pb-8 border-b border-[var(--border-muted)] flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-[var(--surface-high)] border border-[var(--primary)]/20 flex items-center justify-center shadow-[0_0_20px_var(--primary-glow)]">
-              <Image src="/logo.png" alt="Navi AI Logo" width={32} height={32} className="object-contain" />
-            </div>
-            <h1 className="text-3xl font-black tracking-tighter text-[var(--text-primary)]">Navi AI</h1>
-          </div>
-          <p className="text-[var(--text-muted)] text-xs font-bold tracking-[0.2em] uppercase">
-            Your friendly supply chain assistant · 3-Agent Intelligence
-          </p>
+      {/* Subtle Header */}
+      <div className="py-4 border-b border-border/5 flex items-center justify-between px-6">
+        <div className="flex items-center gap-3">
+           <div className="w-8 h-8 rounded-lg bg-surface-high border border-primary/20 flex items-center justify-center shadow-sm">
+              <Cpu size={18} className="text-primary" />
+           </div>
+           <div>
+             <h1 className="text-sm font-bold tracking-tight text-foreground">Navi AI</h1>
+             <div className="flex items-center gap-2">
+                <span className="text-[8px] font-black text-text-muted uppercase tracking-[0.2em] opacity-40">System v4.0.2</span>
+                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+             </div>
+           </div>
         </div>
-        <div className="flex gap-4">
-          <button
-            className="p-3 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl hover:bg-[var(--surface-hover)] transition-all text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-            title="Download Log"
-          >
-            <Download size={18} />
-          </button>
+        <div className="flex gap-2">
           <button
             onClick={() => setMessages([messages[0]])}
-            className="p-3 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl hover:bg-[var(--surface-hover)] transition-all text-[var(--text-muted)] hover:text-[var(--accent)]"
+            className="p-2.5 bg-surface-high/50 border border-border/10 rounded-xl hover:bg-accent/10 transition-all text-text-muted hover:text-accent group shadow-sm"
             title="Clear Chat"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} className="group-hover:rotate-12 transition-transform" />
           </button>
         </div>
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto pt-8 px-2 flex flex-col gap-10 no-scrollbar">
-        {messages.map((msg) => (
-          <motion.div
-            key={msg.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-          >
-            {/* Avatar */}
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${
-              msg.role === 'user'
-                ? 'bg-[var(--secondary)] text-white'
-                : 'bg-[var(--surface-high)] border border-[var(--primary)]/20'
-            }`}>
-              {msg.role === 'user'
-                ? <User size={20} />
-                : <Image src="/logo.png" alt="Navi" width={24} height={24} className="object-contain" />
-              }
-            </div>
-
-            {/* Message body */}
-            <div className={`flex flex-col gap-3 max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-
-              {/* User bubble */}
-              {msg.role === 'user' && (
-                <div className="w-full p-5 rounded-3xl rounded-tr-none text-sm leading-relaxed shadow-xl bg-[var(--secondary)] text-white">
-                  {msg.content}
-                </div>
-              )}
-
-              {/* Error bubble */}
-              {msg.isError && (
-                <div className="w-full p-5 rounded-3xl rounded-tl-none text-sm leading-relaxed shadow-xl bg-rose-500/20 border border-rose-500/50 text-rose-200">
-                  {msg.rawContent}
-                </div>
-              )}
-
-              {/* Assistant bubble */}
-              {msg.role === 'assistant' && !msg.isError && (
-                <div className="w-full p-5 rounded-3xl rounded-tl-none text-sm leading-relaxed shadow-xl glass-card border border-[var(--primary)]/10">
-
-                  {/* Situation (the main reply text) */}
-                  <div className="text-[13px] text-[var(--text-primary)] leading-relaxed">
-                    {msg.friendly?.situation || msg.rawContent}
+      <div 
+        className={`flex-1 px-4 no-scrollbar relative scroll-smooth ${messages.length > 1 ? 'overflow-y-auto pb-32' : 'overflow-hidden'}`}
+        onScroll={handleScroll}
+      >
+        {messages.length === 1 && messages[0].friendly?.isGreeting ? (
+           <EmptyState onSelectSuggestion={(text) => handleSend(null, text)} />
+        ) : (
+          <div className="flex flex-col gap-10 py-8 max-w-3xl mx-auto h-full">
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex gap-5 animate-message-in ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {/* Assistant Avatar (ChatGPT Style - only for assistant) */}
+                {msg.role === 'assistant' && (
+                  <div className="w-8 h-8 rounded-lg bg-surface-high border border-primary/20 flex items-center justify-center shrink-0 mt-1 shadow-sm">
+                    <Cpu size={16} className="text-primary" />
                   </div>
+                )}
 
-                  {/* Greeting / status card */}
-                  {(msg.friendly?.isGreeting || msg.friendly?.isStatusCheck) && (
-                    <GreetingCard friendly={msg.friendly} />
+                <div className={`flex flex-col gap-2 ${msg.role === 'user' ? 'max-w-[80%]' : 'flex-1'}`}>
+                  {/* User Bubble */}
+                  {msg.role === 'user' && (
+                    <div className="p-4 px-6 rounded-[28px] bg-secondary text-white font-medium text-[15px] shadow-sm italic leading-relaxed">
+                      "{msg.content}"
+                    </div>
                   )}
 
-                  {/* Full operational response */}
-                  {msg.friendly && !msg.friendly.isGreeting && !msg.friendly.isStatusCheck && (
-                    <FriendlyResponseCard
-                      friendly={msg.friendly}
-                      impact={msg.impact}
-                      recommendations={msg.recommendations}
-                      bestRoute={msg.bestRoute}
-                      alternatives={msg.alternatives}
-                    />
-                  )}
-                </div>
-              )}
-
-              {/* Pipeline steps toggle */}
-              {msg.role === 'assistant' && !msg.isError && msg.pipeline && (
-                <div className="w-full">
-                  <button
-                    onClick={() => togglePipeline(msg.id)}
-                    className="flex items-center gap-2 text-[10px] font-black text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all uppercase tracking-widest px-1 py-1"
-                  >
-                    {msg.showPipeline ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                    {msg.showPipeline ? 'Hide' : 'Show'} agent steps
-                  </button>
-                  <AnimatePresence>
-                    {msg.showPipeline && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
+                  {/* Assistant Response (ChatGPT Style - Clean Blocks) */}
+                  {msg.role === 'assistant' && !msg.isError && (
+                    <div className="w-full">
+                      <FriendlyResponseCard
+                        friendly={msg.friendly}
+                        impact={msg.impact}
+                        recommendations={msg.recommendations}
+                        bestRoute={msg.bestRoute}
+                        alternatives={msg.alternatives}
+                      />
+                      {msg.pipeline && (
                         <PipelineSteps pipeline={msg.pipeline} />
-                        {msg.reasoning && (
-                          <div className="mt-3 p-4 bg-black/30 border border-[var(--border-muted)] rounded-2xl text-xs text-[var(--text-muted)] italic leading-relaxed">
-                            {msg.reasoning}
-                          </div>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
+                      )}
+                    </div>
+                  )}
 
-        {/* Typing indicator */}
-        {isTyping && (
-          <div className="flex items-center gap-4 text-[var(--primary)] animate-pulse">
-            <Sparkles size={18} />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Navi is thinking…</span>
+                  {/* Error Notification */}
+                  {msg.isError && (
+                    <div className="p-4 px-6 rounded-2xl bg-accent/5 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest leading-relaxed">
+                      {msg.rawContent}
+                    </div>
+                  )}
+                </div>
+
+                {/* User Avatar (Optional - right side) */}
+                {msg.role === 'user' && (
+                   <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 mt-1 shadow-md">
+                      <User size={16} className="text-white" />
+                   </div>
+                )}
+              </motion.div>
+            ))}
+            <div className="h-4" />
           </div>
         )}
-        <div ref={chatEndRef} className="h-4" />
+
+        {/* Scroll to Bottom Button */}
+        <AnimatePresence>
+          {messages.length > 1 && showScrollBtn && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 p-2 bg-surface border border-border/20 rounded-full shadow-2xl text-text-muted hover:text-foreground transition-all z-20"
+            >
+              <ChevronDown size={20} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+        {/* Typing indicator */}
+        {isTyping && (
+          <div className="flex items-center gap-4 text-primary animate-pulse py-2 px-10">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+               <Sparkles size={16} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Neural link actively processing…</span>
+          </div>
+        )}
+        <div ref={chatEndRef} className="h-6" />
       </div>
 
-      {/* Input Section */}
-      <div className="pt-8 mt-auto sticky bottom-0 bg-[var(--bg-primary)]/80 backdrop-blur-md pb-4">
+      {/* Input Experience (ChatGPT Style Pill) */}
+      <div className="pt-2 sticky bottom-0 bg-background/95 backdrop-blur-xl pb-4">
+        <div className="max-w-3xl mx-auto px-4">
+          <form onSubmit={handleSend} className="relative group">
+            <div className="absolute inset-0 bg-primary/10 blur-[40px] rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+            
+            <div className="relative flex items-center bg-surface-high border border-border/50 rounded-full p-2 group-focus-within:border-primary/40 group-focus-within:bg-surface transition-all shadow-2xl overflow-hidden min-h-[64px] focus-within:input-pill-focus">
+              {/* Attachment Icon */}
+              <button 
+                type="button" 
+                className="p-3 ml-1 text-text-muted hover:text-foreground transition-colors hover:bg-white/5 rounded-full"
+              >
+                <Plus size={20} />
+              </button>
 
-        {/* Suggestion chips */}
-        <div className="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
-          {chips.map(chip => (
-            <button
-              key={chip}
-              onClick={() => handleSend(null, chip)}
-              disabled={isTyping}
-              className="px-4 py-2 bg-[var(--surface)] border border-[var(--border-muted)] rounded-2xl text-[10px] font-bold text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)]/50 transition-all whitespace-nowrap uppercase tracking-wide disabled:opacity-50"
-            >
-              {chip === chips[1]
-                ? <span className="flex items-center gap-1 text-[var(--text-primary)]"><CloudLightning size={12} className="text-[var(--accent)]" /> {chip}</span>
-                : chip
-              }
-            </button>
-          ))}
-        </div>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={isTyping}
+                className="flex-1 bg-transparent border-none outline-none text-foreground text-[15px] font-medium px-4 disabled:opacity-50 placeholder:text-text-muted/40 placeholder:font-normal"
+                placeholder="Message Navi AI..."
+              />
 
-        {/* Input form */}
-        <form onSubmit={handleSend} className="relative group">
-          <div className="absolute inset-0 bg-[var(--primary)]/20 blur-[20px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-opacity" />
-          <div className="relative flex items-center bg-[var(--surface-high)] border border-[var(--border-muted)] rounded-[32px] p-2 focus-within:border-[var(--primary)]/50 transition-all shadow-2xl">
-            <div className="p-4 mr-2 text-[var(--text-muted)]/40"><Search size={22} /></div>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isTyping}
-              className="flex-1 bg-transparent border-none outline-none text-[var(--text-primary)] text-sm font-medium py-4 disabled:opacity-50"
-              placeholder="Ask Navi about your shipments, routes, or disruptions…"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isTyping}
-              className="p-4 bg-[var(--primary)] text-black rounded-3xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center gap-3 px-8 shadow-[0_0_20px_var(--primary-glow)]"
-            >
-              <span>{isTyping ? 'Thinking…' : 'Ask Navi'}</span>
-              <Zap size={16} fill="currentColor" />
-            </button>
+              {/* Action Button Integrated */}
+              <div className="flex items-center gap-2 pr-1">
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isTyping}
+                  className={`p-3 rounded-full transition-all flex items-center justify-center min-w-[44px] min-h-[44px] ${
+                    input.trim() 
+                      ? 'bg-foreground text-background scale-100 shadow-lg' 
+                      : 'bg-surface border border-border/10 text-text-muted opacity-30 scale-95'
+                  }`}
+                >
+                  {isTyping ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full" />
+                  ) : (
+                    <Send size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Footer Disclaimer */}
+          <div className="mt-4 text-center">
+            <span className="text-[10px] text-text-muted opacity-30 font-bold uppercase tracking-[0.3em]">
+              Navi AI v4.0 · Cognitive Logistics Core
+            </span>
           </div>
-        </form>
-
-        <div className="mt-4 text-center">
-          <span className="text-[9px] text-[var(--text-muted)]/20 font-bold uppercase tracking-[0.3em]">
-            Navi Intelligence v2.0 · Retrieval → Impact → Decision · Formatter Active
-          </span>
         </div>
       </div>
     </div>

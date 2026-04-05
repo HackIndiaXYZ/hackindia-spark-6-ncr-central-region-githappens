@@ -9,9 +9,12 @@ export default function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    setTheme(savedTheme);
-    document.documentElement.className = savedTheme;
+    // SSR Safe
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      setTheme(savedTheme);
+      document.documentElement.className = savedTheme;
+    }
   }, []);
 
   const toggleTheme = () => {

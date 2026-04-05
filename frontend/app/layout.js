@@ -1,21 +1,21 @@
 import './globals.css';
-import ThemeProvider from '@/components/ThemeProvider';
+import ThemeProvider from '../components/ThemeProvider';
+import { AuthProvider } from '../context/AuthContext';
 
 export const metadata = {
-  title: 'SupplyAlert Sentinel',
+  title: 'SupplyAlert Terminal',
   description: 'Next-Gen Supply Chain Resilience Platform',
-  icons: {
-    icon: '/logo.png',
-  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-[var(--bg-primary)]">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body className="antialiased bg-[#090b0d]">
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

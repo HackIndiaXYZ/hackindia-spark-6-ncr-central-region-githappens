@@ -90,10 +90,10 @@ export default function CommandCenterUI({ initialSummary, initialRecommendations
       {/* ─── TOP KPI ROW ─── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
          {[
-           { label: "Risk Score", value: `${summary?.riskScore || 0}/100`, icon: Globe, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-           { label: "Active Shipments", value: summary?.totalShipments || 0, icon: Package, color: "text-gray-600", bg: "bg-gray-50", border: "border-gray-100" },
-           { label: "High Risk Alerts", value: summary?.criticalAlerts || 0, icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100" },
-           { label: "Cost Exposure", value: `₹${(summary?.totalCostImpact || 0) / 100000}L`, icon: IndianRupee, color: "text-gray-900", bg: "bg-gray-50", border: "border-gray-100" },
+           { label: "Risk Score", value: `${summary?.riskScore || 0}/100`, icon: Globe, color: "text-primary", bg: "bg-primary/10", border: "border-primary/20", trend: "Trending Nominal" },
+           { label: "Active Shipments", value: summary?.totalShipments || 0, icon: Package, color: "text-foreground", bg: "bg-surface-high", border: "border-border", trend: "Active Stream" },
+           { label: "High Risk Alerts", value: summary?.criticalAlerts || 0, icon: AlertTriangle, color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", trend: "Urgent Action" },
+           { label: "Cost Exposure", value: `₹${(summary?.totalCostImpact || 0) / 100000}L`, icon: IndianRupee, color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/20", trend: "Cost Vector" },
          ].map((stat, i) => (
            <motion.div 
              key={stat.label}
@@ -108,10 +108,10 @@ export default function CommandCenterUI({ initialSummary, initialRecommendations
                  </div>
                  <div className="text-[10px] font-black text-text-muted uppercase tracking-[0.25em]">{stat.label}</div>
               </div>
-              <div className={`text-4xl font-bold tracking-tight ${stat.color}`}>{stat.value}</div>
+              <div className={`text-3xl font-black tracking-tight ${stat.color}`}>{stat.value}</div>
               <div className="mt-4 flex items-center gap-2">
-                 <div className={`w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-700"}`} />
-                 <span className="text-[11px] text-text-muted font-bold tracking-tight uppercase">{i % 2 === 0 ? "Trending Nominal" : "Standard Baseline"}</span>
+                 <div className={`w-1.5 h-1.5 rounded-full ${stat.color === 'text-primary' ? 'bg-primary' : stat.color === 'text-accent' ? 'bg-accent' : 'bg-muted'}`} />
+                 <span className="text-[9px] text-text-muted font-black tracking-tight uppercase tracking-widest">{stat.trend}</span>
               </div>
            </motion.div>
          ))}
@@ -207,49 +207,66 @@ export default function CommandCenterUI({ initialSummary, initialRecommendations
 
            {/* Metrics & Analytics (Insights Block) */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[340px]">
-              <div className="bg-surface border border-border p-8 rounded-[32px] shadow-sm flex flex-col">
-                 <div className="flex items-center gap-3 mb-8">
-                    <Activity className="text-blue-500" size={18} />
-                    <div className="flex items-center gap-2 group/tooltip relative">
-                       <h4 className="text-[10px] font-black text-text-muted uppercase tracking-[0.25em]">Stress Index</h4>
-                       <div className="w-3.5 h-3.5 rounded-full bg-surface-high border border-border flex items-center justify-center text-[9px] font-black text-text-muted cursor-help transition-colors group-hover/tooltip:bg-surface-highest">i</div>
-                       <div className="absolute left-0 bottom-full mb-2 w-64 p-3 bg-surface border border-border rounded-xl shadow-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-[11px] font-medium text-text-secondary leading-relaxed normal-case tracking-normal">
-                          Composite metric weighting real-time weather anomalies, port congestion ratios, and geopolitical risk factors across active shipments.
+              <div className="bg-surface border border-border pt-6 px-6 pb-0 rounded-[32px] shadow-sm flex flex-col h-1/2 overflow-hidden">
+                 <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                       <Activity className="text-primary" size={16} />
+                       <div className="flex items-center gap-2 group/tooltip relative">
+                          <h4 className="text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">Stress Index</h4>
+                          <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">84.2</span>
                        </div>
                     </div>
+                    <div className="flex gap-1">
+                       {[1,2,3].map(i => <div key={i} className={`w-1 h-3 rounded-full ${i <= 2 ? 'bg-primary' : 'bg-border'}`}></div>)}
+                    </div>
                  </div>
-                 <div className="flex-1 min-h-0">
+
+                 {/* Detailed Sub-metrics */}
+                 <div className="grid grid-cols-3 gap-2 mb-6">
+                    {[
+                       { label: 'Weather', val: 'Low', color: 'text-primary' },
+                       { label: 'Ports', val: 'High', color: 'text-accent' },
+                       { label: 'Geo', val: 'Med', color: 'text-amber-500' }
+                    ].map(m => (
+                       <div key={m.label} className="bg-surface-high/50 p-2 rounded-xl border border-border/50 text-center">
+                          <div className="text-[8px] font-black text-text-muted uppercase tracking-tighter mb-0.5">{m.label}</div>
+                          <div className={`text-[10px] font-bold ${m.color}`}>{m.val}</div>
+                       </div>
+                    ))}
+                 </div>
+
+                 <div className="flex-1 min-h-[80px] -mx-6 mt-2">
                     <ResponsiveContainer width="100%" height="100%">
-                       <AreaChart data={summary?.trendData || []}>
+                       <AreaChart data={summary?.trendData || []} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                           <defs>
                              <linearGradient id="colorRisk" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
+                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                              </linearGradient>
                           </defs>
-                          <Area type="monotone" dataKey="risk" stroke="#3b82f6" fillOpacity={1} fill="url(#colorRisk)" strokeWidth={2.5} />
+                          <Area type="monotone" dataKey="risk" stroke="var(--primary)" fillOpacity={1} fill="url(#colorRisk)" strokeWidth={2} />
                        </AreaChart>
                     </ResponsiveContainer>
                  </div>
               </div>
 
-              <div className="bg-surface border border-border p-8 rounded-[32px] shadow-sm flex flex-col">
-                 <div className="flex items-center gap-3 mb-8">
-                    <BarChart3 className="text-text-muted" size={18} />
-                    <h4 className="text-[10px] font-black text-text-muted uppercase tracking-[0.25em]">Regional Impact</h4>
+              <div className="bg-surface border border-border p-6 rounded-[32px] shadow-sm flex flex-col h-1/2">
+                 <div className="flex items-center gap-3 mb-6">
+                    <BarChart3 className="text-text-muted" size={16} />
+                    <h4 className="text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">Regional Impact</h4>
                  </div>
-                 <div className="flex flex-col gap-5 overflow-y-auto no-scrollbar">
+                 <div className="flex flex-col gap-4 overflow-y-auto no-scrollbar">
                     {['Shanghai Hub', 'Rotterdam Port', 'LA Corridor'].map((region, i) => (
-                       <div key={region}>
-                          <div className="flex justify-between text-[11px] font-bold text-foreground mb-2.5">
+                       <div key={region} className="group cursor-pointer">
+                          <div className="flex justify-between text-[10px] font-bold text-foreground mb-1.5">
                              <span>{region}</span>
-                             <span className="text-text-muted font-medium">LEVEL {i + 1}</span>
+                             <span className="text-text-muted font-black">L{(i % 2) + 1}</span>
                           </div>
-                          <div className="h-1.5 bg-surface-high rounded-full overflow-hidden">
+                          <div className="h-1 bg-surface-high rounded-full overflow-hidden">
                              <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${60 - (i * 15)}%` }}
-                                className={`h-full ${i === 0 ? "bg-rose-500" : "bg-blue-500"}`}
+                                className={`h-full ${i === 0 ? "bg-accent" : "bg-primary"}`}
                              />
                           </div>
                        </div>

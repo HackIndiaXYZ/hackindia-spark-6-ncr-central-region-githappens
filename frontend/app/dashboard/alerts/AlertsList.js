@@ -24,7 +24,7 @@ export default function AlertsList({ initialAlerts }) {
       case 'high': return 'bg-accent text-white';
       case 'medium': return 'bg-secondary text-white';
       case 'low': return 'bg-primary/20 text-primary border border-primary/20';
-      default: return 'bg-white/10 text-white/40';
+      default: return 'bg-surface-high text-text-muted';
     }
   };
 
@@ -51,20 +51,20 @@ export default function AlertsList({ initialAlerts }) {
       
       <div className="flex justify-between items-center">
          <div>
-            <h1 className="text-3xl font-black tracking-tighter text-white mb-2">Alert Matrix</h1>
-            <p className="text-white/40 text-xs font-bold tracking-[0.2em] uppercase">Tactical Threat & Disruption Feed</p>
+            <h1 className="text-3xl font-black tracking-tighter text-foreground mb-2">Alert Matrix</h1>
+            <p className="text-text-muted text-xs font-bold tracking-[0.2em] uppercase">Tactical Threat & Disruption Feed</p>
          </div>
          <div className="flex gap-4">
-            <div className="flex items-center gap-4 bg-[#0E141A] border border-white/5 px-6 py-4 rounded-[28px] focus-within:border-primary/30 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-               <Search size={18} className="text-white/20" />
+            <div className="flex items-center gap-4 bg-surface border border-border px-6 py-4 rounded-[28px] focus-within:border-primary/30 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+               <Search size={18} className="text-text-muted/30" />
                <input 
                  placeholder="Filter alerts..." 
-                 className="bg-transparent border-none outline-none text-xs text-white placeholder:text-white/10 w-48"
+                 className="bg-transparent border-none outline-none text-xs text-foreground placeholder:text-text-muted/20 w-48"
                  value={searchTerm}
                  onChange={(e) => setSearchTerm(e.target.value)}
                />
             </div>
-            <button className="flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-4 rounded-[28px] text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all">
+            <button className="flex items-center gap-3 bg-surface-high border border-border px-6 py-4 rounded-[28px] text-[11px] font-black uppercase tracking-widest text-text-muted hover:text-foreground hover:bg-surface-highest transition-all">
                <Filter size={16} />
                <span>Matrix Config</span>
             </button>
@@ -77,7 +77,7 @@ export default function AlertsList({ initialAlerts }) {
             <button 
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${activeTab === tab ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(0,218,243,0.1)] text-primary' : 'bg-transparent border-white/5 text-white/30 hover:text-white hover:border-white/10'}`}
+              className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${activeTab === tab ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(0,218,243,0.1)] text-primary' : 'bg-transparent border-border text-text-muted/60 hover:text-foreground hover:border-primary/30'}`}
             >
                {tab}
             </button>
@@ -92,7 +92,7 @@ export default function AlertsList({ initialAlerts }) {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: i * 0.05 }}
-               className={`group bg-[#0E141A]/40 backdrop-blur-xl p-8 rounded-[40px] border shadow-2xl transition-all relative overflow-hidden ${alert.severity === 'critical' || alert.severity === 'high' ? 'border-accent shadow-[0_0_30px_rgba(255,61,0,0.15)]' : 'border-white/5 hover:border-white/10'}`}
+               className={`group bg-surface-high/40 backdrop-blur-xl p-8 rounded-[40px] border shadow-2xl transition-all relative overflow-hidden ${alert.severity === 'critical' || alert.severity === 'high' ? 'border-accent shadow-[0_0_30px_rgba(255,61,0,0.15)]' : 'border-border hover:border-primary/20'}`}
             >
                <div className="flex items-start justify-between relative z-10">
                   <div className="flex items-start gap-8">
@@ -104,18 +104,18 @@ export default function AlertsList({ initialAlerts }) {
                            <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${getPriorityColor(alert.severity)}`}>
                               {alert.severity} Priority
                            </span>
-                           <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">{formatTimestamp(alert.timestamp)}</span>
+                           <span className="text-[10px] font-bold text-text-muted/40 uppercase tracking-widest">{formatTimestamp(alert.timestamp)}</span>
                         </div>
-                        <h3 className="text-2xl font-black tracking-tighter text-white mb-2">{alert.title}</h3>
-                        <p className="text-white/40 text-sm leading-relaxed max-w-2xl font-medium">{alert.message}</p>
+                        <h3 className="text-2xl font-black tracking-tighter text-foreground mb-2">{alert.title}</h3>
+                        <p className="text-text-muted text-sm leading-relaxed max-w-2xl font-medium">{alert.message}</p>
                      </div>
                   </div>
 
                   <div className="flex gap-4 items-center">
-                     <button className={`px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${alert.severity === 'critical' || alert.severity === 'high' ? 'bg-accent text-white hover:scale-105 shadow-[0_0_30px_rgba(255,61,0,0.3)]' : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white'}`}>
+                     <button className={`px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${alert.severity === 'critical' || alert.severity === 'high' ? 'bg-accent text-white hover:scale-105 shadow-[0_0_30px_rgba(255,61,0,0.3)]' : 'bg-surface border border-border text-text-muted hover:bg-surface-high hover:text-foreground'}`}>
                         {alert.read ? 'Acknowledged' : 'Acknowledge'}
                      </button>
-                     <button className="p-3 text-white/10 hover:text-white transition-colors relative"><MoreVertical size={20} /></button>
+                     <button className="p-3 text-text-muted/20 hover:text-foreground transition-colors relative"><MoreVertical size={20} /></button>
                   </div>
                </div>
                
@@ -125,8 +125,8 @@ export default function AlertsList({ initialAlerts }) {
          ))}
 
          {filteredAlerts.length === 0 && (
-            <div className="py-20 text-center bg-[#0E141A]/20 rounded-[32px] border border-dashed border-white/5">
-               <p className="text-white/20 text-xs font-bold uppercase tracking-widest">No matching tactical alerts detected</p>
+            <div className="py-20 text-center bg-surface-high/20 rounded-[32px] border border-dashed border-border">
+               <p className="text-text-muted text-xs font-bold uppercase tracking-widest">No matching tactical alerts detected</p>
             </div>
          )}
       </div>
